@@ -1,0 +1,33 @@
+# Development
+.dart_tool/
+.idea/
+.vscode/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub/
+pubspec.lock
+.gitignore
+.metadata
+
+# Build outputs
+build/
+coverage/
+.test_coverage.dart
+coverage_badge.svg
+
+# Tests
+test/
+integration_test/
+
+# Platform specific development files
+android/.gradle/
+android/local.properties
+android/key.properties
+
+ios/.generated/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Runner.xcodeproj/
+ios/Runner.xcworkspace/
+ios/Pods/ 

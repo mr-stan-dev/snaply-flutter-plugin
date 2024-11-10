@@ -1,0 +1,36 @@
+Snaply
+Copyright 2025 Snaply Dev
+
+This product includes software developed by:
+
+Flutter and the Flutter Authors
+Copyright 2014 The Flutter Authors.
+Licensed under BSD-3-Clause License
+https://github.com/flutter/flutter/blob/master/LICENSE
+
+equatable
+Copyright (c) 2018 Felix Angelov
+Licensed under MIT License
+https://github.com/felangel/equatable/blob/master/LICENSE
+
+video_player
+Copyright 2013 The Flutter Authors
+Licensed under BSD-3-Clause License
+https://github.com/flutter/plugins/blob/main/packages/video_player/video_player/LICENSE
+
+plugin_platform_interface
+Copyright 2013 The Flutter Authors
+Licensed under BSD-3-Clause License
+https://github.com/flutter/plugins/blob/main/packages/plugin_platform_interface/LICENSE
+
+Development Dependencies:
+
+mocktail
+Copyright (c) 2021 Felix Angelov
+Licensed under MIT License
+https://github.com/felangel/mocktail/blob/main/LICENSE
+
+flutter_lints
+Copyright 2013 The Flutter Authors
+Licensed under BSD-3-Clause License
+https://github.com/flutter/packages/blob/main/packages/flutter_lints/LICENSE 
