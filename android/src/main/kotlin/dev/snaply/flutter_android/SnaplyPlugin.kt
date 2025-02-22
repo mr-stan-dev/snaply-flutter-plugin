@@ -1,19 +1,16 @@
 package dev.snaply.flutter_android
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.telephony.TelephonyManager
 import android.util.Log
-import dev.snaply.flutter_android.files.FilesDirManager
-import dev.snaply.flutter_android.files.FilesSharingManager
-import dev.snaply.flutter_android.media_manager.ScreenshotManager
-import dev.snaply.flutter_android.media_manager.service.SnaplyForegroundService
-import dev.snaply.flutter_android.media_manager.video.ScreenVideoManager
-import dev.snaply.flutter_android.media_manager.video.ScreenVideoManager.Companion.SCREEN_RECORD_REQUEST_CODE
 import dev.snaply.flutter_android.device.DeviceInfoProvider
+import dev.snaply.flutter_android.files.FilesManager
+import dev.snaply.flutter_android.files.FilesSharingManager
+import dev.snaply.flutter_android.media_manager.ScreenshotProcessor
+import dev.snaply.flutter_android.media_manager.service.SnaplyForegroundService
+import dev.snaply.flutter_android.media_manager.video.ScreenFramesRecorder
+import dev.snaply.flutter_android.media_manager.video.ScreenVideoRecorder
+import dev.snaply.flutter_android.media_manager.video.ScreenVideoRecorder.Companion.SCREEN_RECORD_REQUEST_CODE
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -37,9 +34,10 @@ import io.flutter.plugin.common.PluginRegistry
 class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityResultListener,
     ActivityAware {
 
-    private var screenVideoManager: ScreenVideoManager? = null
-    private var screenshotManager: ScreenshotManager? = null
-    private var fileManager: FilesSharingManager? = null
+    private var screenVideoRecorder: ScreenVideoRecorder? = null
+    private var screenFramesRecorder: ScreenFramesRecorder? = null
+    private var screenshotProcessor: ScreenshotProcessor? = null
+    private var filesSharingManager: FilesSharingManager? = null
 
     private var activityBinding: ActivityPluginBinding? = null
     private var renderer: FlutterRenderer? = null
@@ -62,6 +60,11 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
     private var pendingResult: Result? = null
 
     /**
+     * Stores if we should use android media projection API for screen recording.
+     */
+    private var isMediaProjection: Boolean = false
+
+    /**
      * Handles method calls from Flutter.
      * Supported methods:
      * - [TAKE_SCREENSHOT_METHOD]: Takes a screenshot of current Flutter UI
@@ -75,7 +78,7 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
         Log.d(LOG_TAG, "onMethodCall: ${call.method}")
         when (call.method) {
             TAKE_SCREENSHOT_METHOD -> handleTakeScreenshot(result)
-            START_SCREEN_RECORDING_METHOD -> handleStartScreenRecording(result)
+            START_SCREEN_RECORDING_METHOD -> handleStartScreenRecording(call, result)
             STOP_SCREEN_RECORDING_METHOD -> handleStopScreenRecording(result)
             SHARE_FILES_METHOD -> handleShareFiles(call, result)
             GET_SNAPLY_DIRECTORY_METHOD -> handleGetSnaplyDirectory(result)
@@ -86,12 +89,11 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
 
     /**
      * Takes a screenshot of the current Flutter UI.
-     * Requires initialized [renderer] and [screenshotManager].
+     * Requires initialized [renderer] and [screenshotProcessor].
      */
     private fun handleTakeScreenshot(result: Result) {
         try {
-            val bitmap = (renderer as FlutterRenderer).bitmap
-            val bytes = screenshotManager?.processScreenshot(bitmap)
+            val bytes = screenshotProcessor?.process(renderer!!.bitmap)
             if (bytes != null) {
                 result.success(bytes)
             } else {
@@ -113,13 +115,26 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
 
     /**
      * Starts screen recording process.
-     * This will trigger permission request and foreground service setup.
+     * @param useMediaProjection if true, uses system screen recording, otherwise uses Flutter UI recording
      */
-    private fun handleStartScreenRecording(result: Result) {
+    private fun handleStartScreenRecording(call: MethodCall, result: Result) {
         try {
-            screenVideoManager?.setupAndRequestRecording(activity)
-                ?: throw IllegalStateException("ScreenRecordApi is not initialized")
-            pendingResult = result
+            val filePath = FilesManager().getVideoFile(activity).absolutePath
+            isMediaProjection = call.argument<Boolean>("isMediaProjection") ?: false
+            if (isMediaProjection) {
+                pendingResult = result
+                screenVideoRecorder?.requestRecording(
+                    outputFilePath = filePath,
+                    activity = activity,
+                )
+                    ?: throw IllegalStateException("ScreenVideoRecorder is not initialized")
+            } else {
+                screenFramesRecorder?.startRecording(
+                    outputFilePath = filePath,
+                    bitmapProvider = { renderer!!.bitmap }
+                )
+                result.success(true)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Start recording error: ${e.message}")
             result.error(
@@ -135,17 +150,15 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
      */
     private fun handleStopScreenRecording(result: Result) {
         try {
-            SnaplyForegroundService.stopService(activity)
-            val path = screenVideoManager?.stopScreenRecording()
-            if (path != null) {
-                result.success(path)
+            val outputPath: String?
+            if (isMediaProjection) {
+                SnaplyForegroundService.stopService(activity)
+                outputPath = screenVideoRecorder?.stopScreenRecording()
+
             } else {
-                result.error(
-                    STOP_SCREEN_RECORDING_METHOD,
-                    "$STOP_SCREEN_RECORDING_METHOD error: path is null",
-                    null,
-                )
+                outputPath = screenFramesRecorder?.stopRecording()
             }
+            result.success(outputPath)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Stop recording error: ${e.message}")
             result.error(
@@ -163,7 +176,8 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
         try {
             val filePaths = call.argument<List<String>>("filePaths")
             if (filePaths != null) {
-                val chooserIntent = fileManager?.createShareChooserIntent(activity, filePaths)
+                val chooserIntent =
+                    filesSharingManager?.createShareChooserIntent(activity, filePaths)
                 if (chooserIntent != null) {
                     activity.startActivity(chooserIntent)
                     result.success(null)
@@ -196,7 +210,7 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
      */
     private fun handleGetSnaplyDirectory(result: Result) {
         try {
-            val reportCacheDir = FilesDirManager().getSnaplyFilesDir(activity)
+            val reportCacheDir = FilesManager().getSnaplyFilesDir(activity)
             Log.d(LOG_TAG, "reportCacheDir: ${reportCacheDir.absolutePath}")
             result.success(reportCacheDir.absolutePath)
         } catch (e: Exception) {
@@ -260,7 +274,7 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
                 activity = activity,
                 onStarted = {
                     Log.d(LOG_TAG, "SnaplyForegroundService.onStarted")
-                    screenVideoManager?.onServiceStarted(resultCode, data)
+                    screenVideoRecorder?.onServiceStarted(resultCode, data)
                     pendingResult?.success(true)
                 },
                 onPermissionsDenied = {
@@ -300,9 +314,10 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activityBinding = binding
         activityBinding?.addActivityResultListener(this)
-        screenVideoManager = ScreenVideoManager()
-        screenshotManager = ScreenshotManager()
-        fileManager = FilesSharingManager()
+        screenVideoRecorder = ScreenVideoRecorder()
+        screenshotProcessor = ScreenshotProcessor()
+        filesSharingManager = FilesSharingManager()
+        screenFramesRecorder = ScreenFramesRecorder()
     }
 
     /**
@@ -312,9 +327,10 @@ class SnaplyPlugin : FlutterPlugin, MethodCallHandler, PluginRegistry.ActivityRe
     override fun onDetachedFromActivity() {
         activityBinding?.removeActivityResultListener(this)
         activityBinding = null
-        screenVideoManager = null
-        screenshotManager = null
-        fileManager = null
+        screenVideoRecorder = null
+        screenshotProcessor = null
+        filesSharingManager = null
+        screenFramesRecorder = null
     }
 
     // Configuration Change Handling

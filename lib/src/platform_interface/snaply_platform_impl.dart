@@ -26,9 +26,12 @@ class SnaplyPlatformImpl implements SnaplyPlatformInterface {
   }
 
   @override
-  Future<void> startVideoRecording() async {
+  Future<void> startVideoRecording({bool isMediaProjection = false}) async {
     try {
-      await methodChannel.invokeMethod<void>(_startScreenRecordingMethod);
+      await methodChannel.invokeMethod<void>(
+        _startScreenRecordingMethod,
+        {'isMediaProjection': isMediaProjection},
+      );
     } on PlatformException catch (e) {
       throw Exception(e.message);
     }

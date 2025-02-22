@@ -46,7 +46,7 @@ class SnaplyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // If disabled, simply return the child widget
-    if (!SnaplyReporter.isEnabled) {
+    if (!SnaplyReporter.instance.isEnabled) {
       return child;
     }
     // Directionality widget is needed to ensure Stack works as expected
