@@ -18,17 +18,25 @@ void main() {
   late MockCustomAttributesHolder attributesHolder;
   late MockSnaplyLogger logger;
   late SnaplyReporter reporter;
+  late VisibilityNotifier visibilityNotifier;
+
+  setUpAll(() {
+    registerFallbackValue(VisibilityNotifier());
+  });
 
   setUp(() {
     configHolder = MockConfigurationHolder();
     attributesHolder = MockCustomAttributesHolder();
     logger = MockSnaplyLogger();
+    visibilityNotifier = VisibilityNotifier();
 
     // Set up default behaviors
-    when(() => configHolder.visibility).thenReturn(VisibilityNotifier());
+    when(() => configHolder.visibility).thenReturn(visibilityNotifier);
+    when(() => configHolder.isEnabled).thenReturn(true);
+    when(() => configHolder.isVisible)
+        .thenAnswer((_) => visibilityNotifier.value);
 
     reporter = SnaplyReporterImpl(
-      isEnabled: true,
       configHolder: configHolder,
       attributesHolder: attributesHolder,
       logger: logger,
@@ -37,72 +45,82 @@ void main() {
 
   group('SnaplyReporter', () {
     test('setVisibility updates configuration when enabled', () {
-      final notifier = VisibilityNotifier();
-      when(() => configHolder.visibility).thenReturn(notifier);
-
       reporter.setVisibility(true);
+      expect(visibilityNotifier.value, true);
 
-      verify(() => configHolder.visibility.value = true).called(1);
+      reporter.setVisibility(false);
+      expect(visibilityNotifier.value, false);
     });
 
     test('setAttributes updates attributes when enabled', () async {
+      when(() => configHolder.isEnabled).thenReturn(true);
+
       final attributes = {'key': 'value'};
       reporter.setAttributes(attributes);
       verify(() => attributesHolder.addAttributes(attributes)).called(1);
     });
 
     test('log adds message when enabled', () {
+      when(() => configHolder.isEnabled).thenReturn(true);
+
       const message = 'test message';
       reporter.log(message: message);
       verify(() => logger.addLog(message: message)).called(1);
     });
 
     test('setVisibility does nothing when reporter is disabled', () {
-      reporter = SnaplyReporterImpl(
-        isEnabled: false,
-        configHolder: configHolder,
-        attributesHolder: attributesHolder,
-        logger: logger,
-      );
+      when(() => configHolder.isEnabled).thenReturn(false);
 
+      final initialValue = visibilityNotifier.value;
       reporter.setVisibility(true);
-      verifyNever(() => configHolder.visibility.value = true);
+
+      // Verify the value didn't change
+      expect(visibilityNotifier.value, equals(initialValue));
     });
 
     test('setAttributes does nothing when reporter is disabled', () async {
-      reporter = SnaplyReporterImpl(
-        isEnabled: false,
-        configHolder: configHolder,
-        attributesHolder: attributesHolder,
-        logger: logger,
-      );
-
+      when(() => configHolder.isEnabled).thenReturn(false);
       final attributes = {'key': 'value'};
+
       reporter.setAttributes(attributes);
-      verifyNever(() => attributesHolder.addAttributes(attributes));
+      verifyNever(() => attributesHolder.addAttributes(any()));
     });
 
     test('log does nothing when reporter is disabled', () {
-      reporter = SnaplyReporterImpl(
-        isEnabled: false,
-        configHolder: configHolder,
-        attributesHolder: attributesHolder,
-        logger: logger,
-      );
-
+      when(() => configHolder.isEnabled).thenReturn(false);
+      when(() => logger.addLog(message: any(named: 'message')))
+          .thenAnswer((_) => {});
       const message = 'test message';
       reporter.log(message: message);
       verifyNever(() => logger.addLog(message: message));
     });
 
-    test('setAttributes handles null attributes', () async {
-      reporter.setAttributes({});
-      verify(() => attributesHolder.addAttributes({})).called(1);
+    test('setAttributes handles different attribute types', () {
+      when(() => configHolder.isEnabled).thenReturn(true);
+
+      final attributes = {
+        'string': 'value',
+        'number': '42',
+        'boolean': 'true',
+      };
+
+      reporter.setAttributes(attributes);
+      verify(() => attributesHolder.addAttributes(attributes)).called(1);
     });
 
-    test('setAttributes handles empty attributes', () async {
-      reporter.setAttributes({});
-      verify(() => attributesHolder.addAttributes({})).called(1);
+    test('log handles different message types', () {
+      when(() => configHolder.isEnabled).thenReturn(true);
+
+      reporter.log(message: 'simple message');
+      verify(() => logger.addLog(message: 'simple message')).called(1);
+
+      reporter.log(message: '');
+      verify(() => logger.addLog(message: '')).called(1);
+
+      reporter.log(message: 'message with special chars !@#\$%^&*()');
+      verify(() =>
+              logger.addLog(message: 'message with special chars !@#\$%^&*()'))
+          .called(1);
     });
   });
 }

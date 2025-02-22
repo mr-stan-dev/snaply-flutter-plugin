@@ -11,11 +11,15 @@ class MediaFilesManager {
     return await _platform.takeScreenshot();
   }
 
-  Future<void> startVideoRecording() async {
-    await _platform.startVideoRecording();
+  Future<void> startVideoRecording({
+    bool isMediaProjection = false,
+  }) async {
+    await _platform.startVideoRecording(
+      isMediaProjection: isMediaProjection,
+    );
   }
 
-  Future<String> stopVideoRecording() async {
+  Future<String?> stopVideoRecording() async {
     return await _platform.stopVideoRecording();
   }
 }

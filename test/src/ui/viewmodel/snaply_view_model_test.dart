@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/entities/severity.dart';
 import 'package:snaply/src/logger/log_record.dart';
@@ -20,17 +21,21 @@ class MockShareReportUsecase extends Mock implements ShareFilesUsecase {}
 
 class MockExtraFilesRepository extends Mock implements ExtraFilesRepository {}
 
+class MockConfigurationHolder extends Mock implements ConfigurationHolder {}
+
 void main() {
   late SnaplyViewModel viewModel;
   late MockMediaManager mediaManager;
   late MockShareReportUsecase shareReportUsecase;
   late MockExtraFilesRepository extraFilesRepository;
+  late MockConfigurationHolder configurationHolder;
   late List<InfoEvent> uiEvents;
 
   setUp(() {
     mediaManager = MockMediaManager();
     shareReportUsecase = MockShareReportUsecase();
     extraFilesRepository = MockExtraFilesRepository();
+    configurationHolder = MockConfigurationHolder();
 
     when(() => extraFilesRepository.getExtraFiles(
           reportAttrs: any(named: 'reportAttrs'),
@@ -40,6 +45,7 @@ void main() {
       mediaManager: mediaManager,
       shareReportUsecase: shareReportUsecase,
       extraFilesRepository: extraFilesRepository,
+      configurationHolder: configurationHolder,
     );
     uiEvents = [];
     viewModel.uiEventsStream.listen(uiEvents.add);
@@ -63,6 +69,8 @@ void main() {
       expect(viewModel.value.mediaFiles.first, isA<ScreenshotFile>());
       expect(viewModel.value.reportingStage, isA<Gathering>());
       expect(uiEvents.last, isA<PlainInfo>());
+
+      verify(() => mediaManager.takeScreenshot()).called(1);
     });
 
     test('take screenshot error shows error message', () async {
@@ -75,6 +83,7 @@ void main() {
 
       expect(viewModel.value.mediaFiles, isEmpty);
       expect(uiEvents.last, isA<ErrorEvent>());
+      verify(() => mediaManager.takeScreenshot()).called(1);
     });
 
     test('screenshots limit prevents taking more', () async {
@@ -101,14 +110,38 @@ void main() {
   });
 
   group('video recording', () {
-    test('start recording updates state and starts timer', () async {
-      when(() => mediaManager.startVideoRecording())
-          .thenAnswer((_) async => {});
+    test(
+        'When media projection enabled '
+        'Then start recording calls media manager with media projection true',
+        () async {
+      const isMediaProjection = true;
+      when(() => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection)).thenAnswer((_) async => {});
+      when(() => configurationHolder.useMediaProjection)
+          .thenReturn(isMediaProjection);
 
       await viewModel.act(StartVideoRecording());
 
       expect(viewModel.value.controlsState, ControlsState.recordingInProgress);
-      verify(() => mediaManager.startVideoRecording()).called(1);
+      verify(() => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection)).called(1);
+    });
+
+    test(
+        'When media projection disabled '
+        'Then start recording calls media manager with media projection false',
+        () async {
+      const isMediaProjection = false;
+      when(() => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection)).thenAnswer((_) async => {});
+      when(() => configurationHolder.useMediaProjection)
+          .thenReturn(isMediaProjection);
+
+      await viewModel.act(StartVideoRecording());
+
+      expect(viewModel.value.controlsState, ControlsState.recordingInProgress);
+      verify(() => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection)).called(1);
     });
 
     test('stop recording adds video file', () async {
@@ -123,6 +156,31 @@ void main() {
       expect(viewModel.value.mediaFiles.first, isA<ScreenVideoFile>());
       expect(viewModel.value.reportingStage, isA<ViewingReport>());
       expect(uiEvents.last, isA<PlainInfo>());
+    });
+
+    test('recording fails shows error message', () async {
+      const isMediaProjection = false;
+      when(() => configurationHolder.useMediaProjection)
+          .thenReturn(isMediaProjection);
+      when(
+        () => mediaManager.startVideoRecording(
+          isMediaProjection: any(named: 'isMediaProjection'),
+        ),
+      ).thenThrow(Exception('Recording failed'));
+
+      await viewModel.act(StartVideoRecording());
+      await pumpEvents();
+
+      expect(
+        viewModel.value.controlsState,
+        isNot(ControlsState.recordingInProgress),
+      );
+      expect(uiEvents.last, isA<ErrorEvent>());
+      verify(
+        () => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection,
+        ),
+      ).called(1);
     });
   });
 

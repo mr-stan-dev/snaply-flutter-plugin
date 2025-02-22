@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:snaply/snaply.dart';
-import '../pages/home_page.dart';
+import 'package:snaply_example/pages/home_page.dart';
 
 class ExampleApp extends StatefulWidget {
   const ExampleApp({Key? key}) : super(key: key);

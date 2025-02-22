@@ -1,4 +1,5 @@
 import 'package:snaply/src/archive/archive_creator.dart';
+import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/mappers/file_to_archive_entry_mapper.dart';
@@ -14,17 +15,19 @@ class SnaplyViewModelCreator {
     final platformInterface = SnaplyPlatformInterface.instance;
 
     return SnaplyViewModel(
-        mediaManager: MediaFilesManager(platformInterface),
-        shareReportUsecase: ShareFilesUsecase(
-          archiveCreator: ArchiveCreator(),
-          platformInterface: platformInterface,
-          fileToPathMapper: FileToPathMapper(),
-          archiveEntryMapper: FileToArchiveEntryMapper(),
-        ),
-        extraFilesRepository: ExtraFilesRepository(
-          platform: platformInterface,
-          logger: SnaplyLogger.instance,
-          customAttributesHolder: CustomAttributesHolder.instance,
-        ));
+      mediaManager: MediaFilesManager(platformInterface),
+      shareReportUsecase: ShareFilesUsecase(
+        archiveCreator: ArchiveCreator(),
+        platformInterface: platformInterface,
+        fileToPathMapper: FileToPathMapper(),
+        archiveEntryMapper: FileToArchiveEntryMapper(),
+      ),
+      extraFilesRepository: ExtraFilesRepository(
+        platform: platformInterface,
+        logger: SnaplyLogger.instance,
+        customAttributesHolder: CustomAttributesHolder.instance,
+      ),
+      configurationHolder: ConfigurationHolder.instance,
+    );
   }
 }

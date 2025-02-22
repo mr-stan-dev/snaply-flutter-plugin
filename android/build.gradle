@@ -73,19 +73,21 @@ android {
 }
 
 def getManifestPath() {
-    def isEnabled = false
-
-    if (project.hasProperty('dart-defines')) {
-        def dartDefines = project.property('dart-defines')
-                .split(',')
-                .collectEntries { entry ->
-                    def keyValue = new String(entry.decodeBase64(), 'UTF-8').split('=')
-                    [(keyValue[0]): keyValue[1]]
-                }
-        isEnabled = dartDefines.SNAPLY_ENABLED == 'true'
+    if (!project.hasProperty('dart-defines')) {
+        return 'src/main/AndroidManifest.xml'
     }
 
-    return isEnabled ?
-            'src/main/PluginEnabledManifest.xml' :
+    def dartDefines = project.property('dart-defines')
+            .split(',')
+            .collectEntries { entry ->
+                def keyValue = new String(entry.decodeBase64(), 'UTF-8').split('=')
+                [(keyValue[0]): keyValue[1]]
+            }
+
+    def snaplyConfig = dartDefines.SNAPLY_CONFIG?.split(';') ?: []
+    def useMediaProjection = snaplyConfig.contains('useAndroidMediaProjection')
+
+    return useMediaProjection ? 
+            'src/main/AndroidManifestWithMediaProjection.xml' : 
             'src/main/AndroidManifest.xml'
 }

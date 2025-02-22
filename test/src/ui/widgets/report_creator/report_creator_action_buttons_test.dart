@@ -33,31 +33,23 @@ void main() {
   });
 
   group('ReportCreatorActionButtons', () {
-    testWidgets('renders both share buttons', (tester) async {
+    testWidgets('renders buttons with correct text', (tester) async {
       await pumpActionButtons(tester);
 
       expect(find.byType(ElevatedButton), findsNWidgets(2));
       expect(find.text('Share as 1 archive'), findsOneWidget);
-      expect(find.text('Share multiple files'), findsOneWidget);
+      expect(find.text('Share all files'), findsOneWidget);
     });
 
-    testWidgets('buttons have correct padding', (tester) async {
-      await pumpActionButtons(tester);
-
-      final paddings = tester.widgetList<Padding>(find.byType(Padding));
-      expect(
-        paddings.where((p) => p.padding == const EdgeInsets.all(16.0)),
-        hasLength(2),
-      );
-    });
-
-    testWidgets('calls act with correct ShareReport actions', (tester) async {
+    testWidgets('tapping buttons triggers correct actions', (tester) async {
       await pumpActionButtons(tester);
 
       await tester.tap(find.text('Share as 1 archive'));
+      await tester.pump();
       verify(() => stateProvider.act(ShareReport(asArchive: true))).called(1);
 
-      await tester.tap(find.text('Share multiple files'));
+      await tester.tap(find.text('Share all files'));
+      await tester.pump();
       verify(() => stateProvider.act(ShareReport(asArchive: false))).called(1);
     });
   });

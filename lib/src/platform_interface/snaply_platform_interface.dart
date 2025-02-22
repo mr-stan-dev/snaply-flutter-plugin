@@ -29,7 +29,9 @@ abstract class SnaplyPlatformInterface extends PlatformInterface {
     throw UnimplementedError('takeScreenshot() has not been implemented.');
   }
 
-  Future<void> startVideoRecording() {
+  Future<void> startVideoRecording({
+    bool isMediaProjection = false,
+  }) {
     throw UnimplementedError('startVideoRecording() has not been implemented.');
   }
 
