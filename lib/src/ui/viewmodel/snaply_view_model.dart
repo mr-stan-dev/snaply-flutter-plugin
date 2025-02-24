@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:snaply/snaply.dart';
+import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/logger/default_logs.dart';
 import 'package:snaply/src/media_manager/media_files_manager.dart';
@@ -15,18 +16,21 @@ import 'package:snaply/src/utils/notifier_logging_mixin.dart';
 
 class SnaplyViewModel extends ValueNotifier<SnaplyState>
     with NotifierLoggingMixin<SnaplyState> {
-  SnaplyViewModel(
-      {required MediaFilesManager mediaManager,
-      required ShareFilesUsecase shareReportUsecase,
-      required ExtraFilesRepository extraFilesRepository})
-      : _mediaManager = mediaManager,
+  SnaplyViewModel({
+    required MediaFilesManager mediaManager,
+    required ShareFilesUsecase shareReportUsecase,
+    required ExtraFilesRepository extraFilesRepository,
+    required ConfigurationHolder configurationHolder,
+  })  : _mediaManager = mediaManager,
         _shareReportUsecase = shareReportUsecase,
         _extraFilesRepository = extraFilesRepository,
+        _configurationHolder = configurationHolder,
         super(SnaplyState.initial);
 
   final MediaFilesManager _mediaManager;
   final ShareFilesUsecase _shareReportUsecase;
   final ExtraFilesRepository _extraFilesRepository;
+  final ConfigurationHolder _configurationHolder;
 
   final _uiEventsController = StreamController<InfoEvent>();
 
@@ -156,7 +160,9 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       return;
     }
     try {
-      await _mediaManager.startVideoRecording();
+      await _mediaManager.startVideoRecording(
+        isMediaProjection: _configurationHolder.useMediaProjection,
+      );
       SnaplyReporter.instance.log(message: DefaultLogs.screenVideoStarted);
       _videoStartedAt = DateTime.timestamp();
       value = value.copyWith(
@@ -180,6 +186,8 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
   Future<void> _stopVideoRecording() async {
     try {
       final path = await _mediaManager.stopVideoRecording();
+      if (path == null) throw Exception('Video output path is null');
+
       // As we'll trigger ViewingReport stage we need to add extra files
       await _addExtraFiles();
       SnaplyReporter.instance.log(message: DefaultLogs.screenVideoFinished);

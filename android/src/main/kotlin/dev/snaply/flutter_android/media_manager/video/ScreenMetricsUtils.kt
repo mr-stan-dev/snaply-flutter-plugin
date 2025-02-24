@@ -6,30 +6,14 @@ import android.util.DisplayMetrics
 import android.util.Log
 import androidx.annotation.RequiresApi
 
-/**
- * Utility class for handling screen metrics across different Android versions.
- * Provides compatibility layer for getting screen dimensions on Android R and below.
- */
 object ScreenMetricsUtils {
 
     private const val LOG_TAG = "ScreenMetricsUtils"
 
-    /**
-     * API version-specific implementation for getting screen metrics.
-     * Uses [ApiLevel30] for Android R and above, falls back to [Api] for older versions.
-     */
     private val api: Api =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ApiLevel30()
         else Api()
 
-    /**
-     * Gets screen metrics for the given activity.
-     * Throws exception if metrics are invalid or cannot be retrieved.
-     *
-     * @param activity Activity to get metrics from
-     * @return DisplayMetrics object with screen dimensions and density
-     * @throws IllegalStateException if metrics are invalid or cannot be retrieved
-     */
     fun getMetrics(activity: Activity): DisplayMetrics {
         try {
             val metrics = api.getScreenSize(activity)
@@ -44,10 +28,6 @@ object ScreenMetricsUtils {
         }
     }
 
-    /**
-     * Base implementation for getting screen metrics.
-     * Uses deprecated WindowManager.getDefaultDisplay() for Android Q and below.
-     */
     private open class Api {
         open fun getScreenSize(activity: Activity): DisplayMetrics {
             val metrics = DisplayMetrics()
@@ -63,10 +43,6 @@ object ScreenMetricsUtils {
         }
     }
 
-    /**
-     * Android R (API 30) specific implementation for getting screen metrics.
-     * Uses Activity.getDisplay() which provides more accurate metrics.
-     */
     private class ApiLevel30 : Api() {
         @RequiresApi(Build.VERSION_CODES.R)
         override fun getScreenSize(activity: Activity): DisplayMetrics {

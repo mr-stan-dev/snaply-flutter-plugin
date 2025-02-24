@@ -1,3 +1,7 @@
+## 0.0.1-alpha.2
+
+Implement frame sequence recorder for Android as alternative to media projection API.
+
 ## 0.0.1-alpha.1
 
 Initial alpha release of Snaply plugin.
