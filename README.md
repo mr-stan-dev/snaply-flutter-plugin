@@ -24,7 +24,7 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 
 ```yaml  
 dependencies:
-  snaply: ^0.0.1-alpha.1  
+  snaply: ^0.0.1-alpha.2  
 ```  
 
 2. Simply wrap your App with SnaplyApp:
