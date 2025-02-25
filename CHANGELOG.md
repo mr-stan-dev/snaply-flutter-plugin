@@ -1,3 +1,7 @@
+## 0.0.1-alpha.3
+
+Improve documentation
+
 ## 0.0.1-alpha.2
 
 Implement frame sequence recorder for Android as alternative to media projection API.
