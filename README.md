@@ -20,7 +20,10 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 
 ## Demo
 
-https://github.com/user-attachments/assets/fa8eb690-fbb6-4e30-866f-2b1fd641c49a
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/fa8eb690-fbb6-4e30-866f-2b1fd641c49a" />
+</div>
+
 
 
 ## Quick Start
