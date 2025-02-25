@@ -12,7 +12,8 @@ class ConfigurationHolder {
 
   static final List<String> _configValues = _envConfig.split(';');
 
-  bool get useMediaProjection => _configValues.contains('useAndroidMediaProjection');
+  bool get useMediaProjection =>
+      _configValues.contains('useAndroidMediaProjection');
 
   bool isEnabled = false;
 
