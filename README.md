@@ -21,7 +21,7 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 ## Demo
 
 <div align="center">
-  <video src="https://github.com/user-attachments/assets/fa8eb690-fbb6-4e30-866f-2b1fd641c49a" />
+  <video src="https://github.com/user-attachments/assets/fa8eb690-fbb6-4e30-866f-2b1fd641c49a"></video>
 </div>
 
 
@@ -32,7 +32,7 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 
 ```yaml  
 dependencies:
-  snaply: ^0.0.1-alpha.2  
+  snaply: ^0.0.1-alpha.3  
 ```  
 
 2. Simply wrap your App with SnaplyApp:
