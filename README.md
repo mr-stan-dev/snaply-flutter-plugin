@@ -18,6 +18,14 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 * 📊 Event logging
 * 📁 Sharing all these files as archive or separately
 
+## Demo
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/fa8eb690-fbb6-4e30-866f-2b1fd641c49a" />
+</div>
+
+
+
 ## Quick Start
 
 1. Add to your `pubspec.yaml`:
