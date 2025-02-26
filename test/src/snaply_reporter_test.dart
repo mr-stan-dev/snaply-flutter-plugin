@@ -6,7 +6,11 @@ import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
 
-class MockConfigurationHolder extends Mock implements ConfigurationHolder {}
+class MockConfigurationHolder extends Mock implements ConfigurationHolder {
+  // Remove this override since we want to mock it normally
+  // @override
+  // void setMode(SnaplyReporterMode? mode) {}
+}
 
 class MockCustomAttributesHolder extends Mock
     implements CustomAttributesHolder {}
@@ -22,6 +26,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(VisibilityNotifier());
+    registerFallbackValue(SharingFilesMode());
   });
 
   setUp(() {
@@ -41,6 +46,74 @@ void main() {
       attributesHolder: attributesHolder,
       logger: logger,
     );
+  });
+
+  group('initialization', () {
+    test('isEnabled reflects configuration holder state', () {
+      when(() => configHolder.isEnabled).thenReturn(true);
+      expect(reporter.isEnabled, isTrue);
+
+      when(() => configHolder.isEnabled).thenReturn(false);
+      expect(reporter.isEnabled, isFalse);
+    });
+
+    test('init sets default mode when no mode provided', () async {
+      when(() => configHolder.isEnabled).thenReturn(false);
+
+      await reporter.init();
+
+      verify(() => configHolder.setMode(any())).called(1);
+    });
+
+    test('init sets provided mode', () async {
+      when(() => configHolder.isEnabled).thenReturn(false);
+      final mode = SharingFilesMode();
+
+      await reporter.init(mode: mode);
+
+      verify(() => configHolder.setMode(mode)).called(1);
+    });
+
+    test('init throws when attempting to initialize already enabled reporter',
+        () async {
+      when(() => configHolder.isEnabled).thenReturn(true);
+
+      when(() => configHolder.setMode(any()))
+          .thenThrow(Exception('SnaplyReporterMode can be set only once'));
+
+      expect(
+          () => reporter.init(),
+          throwsA(isA<Exception>().having((e) => e.toString(), 'message',
+              contains('SnaplyReporterMode can be set only once'))));
+    });
+  });
+
+  group('integration scenarios', () {
+    test('initialization enables reporter', () async {
+      when(() => configHolder.isEnabled).thenReturn(false);
+
+      await reporter.init();
+
+      verify(() => configHolder.setMode(any())).called(1);
+      // After init, subsequent calls should see reporter as enabled
+      when(() => configHolder.isEnabled).thenReturn(true);
+
+      // Now we can perform operations
+      reporter.setVisibility(true);
+      expect(visibilityNotifier.value, true);
+    });
+
+    test('disabled reporter performs no operations', () async {
+      when(() => configHolder.isEnabled).thenReturn(false);
+
+      reporter.setVisibility(false);
+      reporter.setAttributes({'key': 'value'});
+      reporter.log(message: 'test');
+
+      expect(visibilityNotifier.value, true);
+      verifyNever(() => attributesHolder.addAttributes(any()));
+      verifyNever(() => logger.addLog(message: any(named: 'message')));
+    });
   });
 
   group('SnaplyReporter', () {

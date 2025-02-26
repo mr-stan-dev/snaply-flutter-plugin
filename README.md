@@ -36,7 +36,7 @@ dependencies:
 ```dart  
 void main() {
   const myApp = MyApp();
-  SnaplyReporter.instance.isEnabled = true;
+  SnaplyReporter.instance.init();
   if (SnaplyReporter.instance.isEnabled) {
     runApp(const SnaplyApp(child: myApp));
   } else {
