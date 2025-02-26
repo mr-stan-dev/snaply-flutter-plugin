@@ -3,6 +3,7 @@ import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter.dart';
+import 'package:snaply/src/snaply_reporter_mode.dart';
 
 class SnaplyReporterImpl implements SnaplyReporter {
   SnaplyReporterImpl({
@@ -18,10 +19,12 @@ class SnaplyReporterImpl implements SnaplyReporter {
   final SnaplyLogger _logger;
 
   @override
-  bool get isEnabled => _configHolder.isEnabled;
+  Future<void> init({SnaplyReporterMode? mode}) async {
+    _configHolder.setMode(mode);
+  }
 
   @override
-  set isEnabled(bool value) => _configHolder.isEnabled = value;
+  bool get isEnabled => _configHolder.isEnabled;
 
   @override
   void setVisibility(bool visibility) {
@@ -43,7 +46,8 @@ class SnaplyReporterImpl implements SnaplyReporter {
   }
 
   void _runIfEnabled(VoidCallback function) {
-    if (!_configHolder.isEnabled) return;
-    function();
+    if (isEnabled) {
+      function();
+    }
   }
 }

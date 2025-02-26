@@ -1,11 +1,10 @@
-
 # Snaply
 
-⚠️ This plugin is still in alpha so API might change. ⚠️
+⚠️ This plugin is in alpha stage and its API may change. ⚠️
 
-A Flutter plugin for instant bug reports sharing with screenshots, screen recordings, attributes and logs.
+A Flutter plugin that enables instant bug reports sharing with screenshots, screen recordings, attributes, and logs.
 
-Intended to be used by developers and QA engineers in builds for debugging & testing.
+Designed for developers and QA engineers to enhance debugging and testing processes.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -16,7 +15,13 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 * 📱 Device & System information collection
 * 📝 Custom attributes support
 * 📊 Event logging
-* 📁 Sharing all these files as archive or separately
+* 📁 Share all data as an archive or individual files
+
+## Demo
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/fa8eb690-fbb6-4e30-866f-2b1fd641c49a"></video>
+</div>
 
 ## Quick Start
 
@@ -24,15 +29,17 @@ Intended to be used by developers and QA engineers in builds for debugging & tes
 
 ```yaml  
 dependencies:
-  snaply: ^0.0.1-alpha.2  
+  snaply: ^0.0.1-alpha.3  
 ```  
 
-2. Simply wrap your App with SnaplyApp:
+2. Wrap your App with SnaplyApp:
 ```dart  
 void main() {
   const myApp = MyApp();
-  SnaplyReporter.instance.isEnabled = true;
-  if (SnaplyReporter.instance.isEnabled) {
+  // Enable Snaply based on your build configuration
+  const isSnaplyEnabled = true;
+  if (isSnaplyEnabled) {
+    SnaplyReporter.instance.init();
     runApp(const SnaplyApp(child: myApp));
   } else {
     runApp(myApp);
@@ -42,17 +49,17 @@ void main() {
 
 ## How to
 
-### Set visibility
+### Control Visibility
 
-By default report button is visible. If you need it to show/hide - use this method:
+The report button is visible by default. To show or hide it, use:
 
 ```dart  
 SnaplyReporter.instance.setVisibility(false);
 ```  
 
-### Set custom attributes
+### Add Custom Attributes
 
-By default Snaply gathers device & system attributes. But you can also add your custom attributes:
+While Snaply automatically collects device & system attributes, you can add custom attributes:
 
 ```dart  
  SnaplyReporter.instance.setAttributes(
@@ -63,35 +70,34 @@ By default Snaply gathers device & system attributes. But you can also add your 
   );
 ```  
 
-### Add logs
+### Add Logs
 
-By default Snaply adds only few internal logs. If you want to have all logs - call this in your App's logger:
+Snaply includes basic internal logs by default. To capture additional logs, add this to your app's logger:
 
 ```dart  
 SnaplyReporter.instance.log(message: 'Onboarding finished'); 
 ```
 
-## Platform specifics
+## Platform Specifics
 
-### Android screen recording
+### Android Screen Recording
 
-**- Frame sequence mode:**
+**Frame Sequence Mode (Default):**
 
-By default Snaply plugin is using this mode to build mp4 video file from a bunch of taken frames. This approach has doesn't require any extra permissions but has some drawbacks:
-1. Records only your Flutter App's UI (all system UI elements & native views will be invisible)
-2. You might see some minor UI glitches
-3. Quality is not very high, but acceptable
+This mode creates an MP4 video from captured frames. No additional permissions are required, but there are some limitations:
+1. Only captures Flutter App UI (system UI elements & native views are not included)
+2. May show minor UI glitches
+3. Provides acceptable but not optimal quality
 
-**- Media projection mode:**
+**Media Projection Mode:**
 
-If you set the next flag:
+Enable this mode by setting:
   ```bash  
 --dart-define=SNAPLY_CONFIG=useAndroidMediaProjection
 ```  
-Snaply will add required permissions to `AndroidManifest.xml` and will use MediaProjection API for screen recording. This will have the next benefits:
-1. All the elements on the screen(System UI, native views) will be visible. It can even record other apps
-2. Good video quality
-3. Generally, size of the file is smaller
+This mode uses Android MediaProjection API. Snaply will add required permissions to `AndroidManifest.xml` automatically. With this mode you'll have:
+1. Complete screen capture including system UI and native views
+2. Higher video quality
 
 Permissions to be added by Snaply if you set `useAndroidMediaProjection` flag:
 
@@ -100,23 +106,23 @@ Permissions to be added by Snaply if you set `useAndroidMediaProjection` flag:
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />   
 ```
 
-As a general rule of thumb - always use media projection mode for builds you **do not ship** to GooglePlay. Or if you already have these permissions in your `AndroidManifest.xml`. Otherwise - use frame sequence mode
+Best Practice: Use media projection mode only for development/testing builds, not for Google Play releases, unless these permissions are already part of your app.
 
 ⚠️ **WARNING!** ⚠️ If you send a build with `useAndroidMediaProjection` flag to GooglePlay - it might not pass App review and Google will ask to explain why you need screen recording permissions.
 
-### iOS screen recording
+### iOS Screen Recording
 
-iOS uses ReplayKit to record your App's screen. It takes only your Flutter App's UI. The same as on Android it means that system UI & native views will be invisible.
+Uses ReplayKit to capture the Flutter App UI only. Like Android, system UI & native views are not included.
 
-Note: `useAndroidMediaProjection` is being ignored on iOS platform
+Note: The `useAndroidMediaProjection` flag has no effect on iOS
 
-### Android screenshots
+### Android Screenshots
 
-Similar to frame sequence recording at the moment there are some limitations. It takes only your Flutter App's UI (system UI elements & native views will be invisible)
+Currently limited to Flutter App UI capture only (system UI elements & native views are not included)
 
-### iOS screenshots
+### iOS Screenshots
 
-iOS uses UIKit to take screenshots. The same as on Android system UI elements & native views will be invisible
+Uses UIKit for screenshots, capturing only Flutter App UI (system UI elements & native views are not included)
 
 ## Requirements
 

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:snaply/src/snaply_reporter_mode.dart';
 
 class ConfigurationHolder {
   ConfigurationHolder._();
@@ -12,9 +13,26 @@ class ConfigurationHolder {
 
   static final List<String> _configValues = _envConfig.split(';');
 
-  bool get useMediaProjection => _configValues.contains('useAndroidMediaProjection');
+  bool get useMediaProjection =>
+      _configValues.contains('useAndroidMediaProjection');
 
-  bool isEnabled = false;
+  SnaplyReporterMode? _mode;
+
+  SnaplyReporterMode get mode {
+    if (_mode == null) {
+      throw Exception('Attempt to get mode when it is not enabled');
+    }
+    return _mode!;
+  }
+
+  void setMode(SnaplyReporterMode? mode) {
+    if (isEnabled) {
+      throw Exception('SnaplyReporterMode can be set only once');
+    }
+    _mode = mode ?? SharingFilesMode();
+  }
+
+  bool get isEnabled => _mode != null;
 
   final VisibilityNotifier visibility = VisibilityNotifier();
 
