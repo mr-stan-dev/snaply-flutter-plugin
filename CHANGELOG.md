@@ -1,6 +1,7 @@
 ## 0.0.1-alpha.3
 
-Improve documentation
+- Implement setting Snaply mode when init plugin
+- Improve documentation
 
 ## 0.0.1-alpha.2
 
