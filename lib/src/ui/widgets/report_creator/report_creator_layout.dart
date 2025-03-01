@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:snaply/src/ui/state/reporting_stage.dart';
 import 'package:snaply/src/ui/state/snaply_state.dart';
+import 'package:snaply/src/ui/theme/snaply_theme.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_creator_app_bar_builder.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_files/full/report_files_full_view_layout.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_reviewing_widget.dart';
@@ -16,9 +17,12 @@ class ReportCreatorLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: ReportCreatorAppBarBuilder.build(context, state),
-      body: SafeArea(child: _bodyWidget()),
+    return MaterialApp(
+      theme: SnaplyTheme.defaultTheme,
+      home: Scaffold(
+        appBar: ReportCreatorAppBarBuilder.build(context, state),
+        body: SafeArea(child: _bodyWidget()),
+      ),
     );
   }
 

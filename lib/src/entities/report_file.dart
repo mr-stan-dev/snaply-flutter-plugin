@@ -2,6 +2,9 @@ import 'dart:typed_data';
 
 import 'package:snaply/src/logger/log_record.dart';
 
+const videoFileType = 'video';
+const imageFileType = 'image';
+
 sealed class ReportFile {
   const ReportFile({
     required this.fileName,
@@ -34,7 +37,7 @@ class ScreenVideoFile extends ReportFile {
     required this.endedAt,
   }) : super(
           fileName: 'snaply_screen_video.mp4',
-          type: 'video',
+          type: videoFileType,
           subtype: 'mp4',
         );
 
@@ -56,7 +59,7 @@ class ScreenshotFile extends ReportFile {
     required this.createdAt,
   }) : super(
           fileName: 'snaply_screenshot_${index + 1}.png',
-          type: 'image',
+          type: imageFileType,
           subtype: 'png',
         );
 

@@ -27,7 +27,7 @@ void main() {
 
     testWidgets('displays existing title in input field', (tester) async {
       const title = 'Test Report';
-      final state = SnaplyState.initial.copyWith(title: title);
+      final state = SnaplyState.initial.copyWith(fileName: title);
 
       await pumpTitleWidget(tester, state);
 

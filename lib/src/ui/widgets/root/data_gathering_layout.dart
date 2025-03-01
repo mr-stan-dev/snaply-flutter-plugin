@@ -42,17 +42,20 @@ class _DataGatheringLayoutState extends State<DataGatheringLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          right: _xPos,
-          bottom: _yPos,
-          child: GestureDetector(
-            onPanUpdate: _onPanUpdate,
-            child: ControlButtons(state: widget.state),
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      child: Stack(
+        children: [
+          Positioned(
+            right: _xPos,
+            bottom: _yPos,
+            child: GestureDetector(
+              onPanUpdate: _onPanUpdate,
+              child: ControlButtons(state: widget.state),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
