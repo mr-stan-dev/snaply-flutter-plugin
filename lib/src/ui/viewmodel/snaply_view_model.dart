@@ -83,6 +83,8 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
           controlsState: ControlsState.active,
           reportingStage: Gathering(),
         );
+      case DeleteMediaFile():
+        _handleDeleteMediaFile(action.fileName);
       case StartVideoRecording():
         await _startVideoRecording();
       case StopVideoRecording():
@@ -212,7 +214,20 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
     }
   }
 
+  void _handleDeleteMediaFile(String fileName) {
+    final newMediaFiles = [...value.mediaFiles];
+    final fileToRemove =
+        value.mediaFiles.firstWhere((f) => f.fileName == fileName);
+    final isVideo = fileToRemove.type == videoFileType;
+    if (isVideo) {
+      _resetVideoState();
+    }
+    newMediaFiles.remove(fileToRemove);
+    value = value.copyWith(mediaFiles: newMediaFiles);
+  }
+
   void _resetVideoState() {
+    value = value.copyWith(screenVideoProgressSec: 0);
     _videoStartedAt = null;
     _videoProgressTimer?.cancel();
     _videoProgressTimer = null;

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:snaply/snaply.dart';
 import 'package:snaply/src/ui/theme/snaply_theme.dart';
@@ -56,44 +55,11 @@ class SnaplyApp extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           child,
-          _snaplyOverlay(),
-        ],
-      ),
-    );
-  }
-
-  /// Creates the Snaply overlay with necessary widget wrappers. This is needed
-  /// to avoid using heavier MateralApp widget for the overlay.
-  ///
-  /// The widget hierarchy is structured to handle various Flutter framework
-  /// requirements:
-  /// - [DefaultTextEditingShortcuts]: Provides standard text editing shortcuts
-  ///   for text fields in the report editor
-  /// - [TextFieldTapRegion]: Ensures proper focus handling for text input fields
-  /// - [Localizations]: Sets up English localization for material widgets
-  /// - [Theme]: Applies Snaply's custom theme
-  /// - [Overlay]: Provides a layer for floating UI elements (needed for TextField)
-  Widget _snaplyOverlay() {
-    return DefaultTextEditingShortcuts(
-      child: TextFieldTapRegion(
-        child: Localizations(
-          locale: const Locale('en'),
-          delegates: const [
-            DefaultMaterialLocalizations.delegate,
-            DefaultWidgetsLocalizations.delegate,
-            DefaultCupertinoLocalizations.delegate,
-          ],
-          child: Theme(
+          Theme(
             data: SnaplyTheme.defaultTheme,
-            child: Overlay(
-              initialEntries: [
-                OverlayEntry(
-                  builder: (context) => const SnaplyRootWidget(),
-                ),
-              ],
-            ),
+            child: const SnaplyRootWidget(),
           ),
-        ),
+        ],
       ),
     );
   }

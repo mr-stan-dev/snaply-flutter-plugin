@@ -31,10 +31,22 @@ class ViewFileFullScreen extends SnaplyStateAction {
   final int index;
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        isMediaFiles,
+        index,
+      ];
 }
 
 class AddMediaFiles extends SnaplyStateAction {}
+
+class DeleteMediaFile extends SnaplyStateAction {
+  DeleteMediaFile(this.fileName);
+
+  final String fileName;
+
+  @override
+  List<Object?> get props => [fileName];
+}
 
 class UpdateReportTitle extends SnaplyStateAction {
   UpdateReportTitle(this.title);
@@ -42,7 +54,7 @@ class UpdateReportTitle extends SnaplyStateAction {
   final String title;
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [title];
 }
 
 class StartVideoRecording extends SnaplyStateAction {}

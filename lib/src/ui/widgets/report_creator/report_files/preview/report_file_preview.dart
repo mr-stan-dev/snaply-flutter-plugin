@@ -18,28 +18,39 @@ class ReportFilePreview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: InkWell(
-        onTap: () => context.act(ViewFileFullScreen(file.isMediaFile, index)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.grey,
+      child: Stack(
+        children: [
+          InkWell(
+            onTap: () =>
+                context.act(ViewFileFullScreen(file.isMediaFile, index)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: _filePreview(),
+                    ),
+                  ),
                 ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: _filePreview(),
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (file.isMediaFile)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: _deleteButton(context),
+            ),
+        ],
       ),
     );
   }
@@ -91,5 +102,48 @@ class ReportFilePreview extends StatelessWidget {
           ),
         );
     }
+  }
+
+  Widget _deleteButton(BuildContext context) {
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        padding: EdgeInsets.zero,
+        shape: const CircleBorder(),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+      ).copyWith(
+        minimumSize: WidgetStateProperty.all(const Size(24, 24)),
+        fixedSize: WidgetStateProperty.all(const Size(24, 24)),
+      ),
+      onPressed: () => _showDeleteDialog(context),
+      child: const Icon(
+        Icons.close,
+        size: 16,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Future<void> _showDeleteDialog(BuildContext parentContext) {
+    return showDialog(
+      context: parentContext,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete file?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              parentContext.act(DeleteMediaFile(file.fileName));
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 }

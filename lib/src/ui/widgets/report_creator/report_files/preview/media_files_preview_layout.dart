@@ -14,19 +14,13 @@ class MediaFilesPreviewLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (mediaFiles.isEmpty) {
-      return const Center(
-        child: Text('No media files attached'),
-      );
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Text(
-              'Media files',
+              mediaFiles.isNotEmpty ? 'Media files' : 'No media files',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Spacer(),
@@ -41,13 +35,14 @@ class MediaFilesPreviewLayout extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: _mediaFilesPreview(),
+        if (mediaFiles.isNotEmpty)
+          SizedBox(
+            height: 120,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: _mediaFilesPreview(),
+            ),
           ),
-        ),
         const SizedBox(height: 16),
       ],
     );
