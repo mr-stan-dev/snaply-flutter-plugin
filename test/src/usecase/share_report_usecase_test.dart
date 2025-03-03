@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -32,8 +31,7 @@ void main() {
   );
 
   final screenshotFile = ScreenshotFile(
-    bytes: Uint8List(0),
-    index: screenshotIndex,
+    filePath: screenshotPath,
     createdAt: DateTime.now(),
   );
 

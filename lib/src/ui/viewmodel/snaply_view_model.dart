@@ -78,7 +78,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
             index: action.index,
           ),
         );
-      case AddMediaFiles():
+      case CaptureMediaFiles():
         value = value.copyWith(
           controlsState: ControlsState.active,
           reportingStage: Gathering(),
@@ -130,25 +130,18 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       // Delay needed to hide controls before we take a screenshot
       // 30 ms works fine on both android & ios
       await Future.delayed(screenshotDelay);
-      final bytes = await _mediaManager.takeScreenshot();
-      if (bytes != null) {
+      final index = value.mediaFiles.whereType<ScreenshotFile>().length;
+      final screenshot = await _mediaManager.takeScreenshot(index);
+      if (screenshot != null) {
         SnaplyReporter.instance.log(message: DefaultLogs.screenshotTaken);
         _uiEventsController.add(PlainInfo.short('Screenshot taken'));
-        final index = value.mediaFiles.whereType<ScreenshotFile>().length;
         value = value.copyWith(
-          mediaFiles: [
-            ...value.mediaFiles,
-            ScreenshotFile(
-              bytes: bytes,
-              index: index,
-              createdAt: DateTime.timestamp(),
-            )
-          ],
+          mediaFiles: [...value.mediaFiles, screenshot],
           controlsState: ControlsState.active,
           reportingStage: Gathering(),
         );
       } else {
-        throw Exception('Image bytes == null');
+        throw Exception('screenshot == null');
       }
     } catch (e, s) {
       _showError(e, s, errorMsg: 'Take screenshot error');
@@ -187,23 +180,16 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
 
   Future<void> _stopVideoRecording() async {
     try {
-      final path = await _mediaManager.stopVideoRecording();
-      if (path == null) throw Exception('Video output path is null');
-
+      final videoFile = await _mediaManager.stopVideoRecording(
+        videoStartedAt: _videoStartedAt,
+      );
       // As we'll trigger ViewingReport stage we need to add extra files
       await _addExtraFiles();
       SnaplyReporter.instance.log(message: DefaultLogs.screenVideoFinished);
       _uiEventsController.add(PlainInfo.short('Screen video taken'));
       value = value.copyWith(
         controlsState: ControlsState.invisible,
-        mediaFiles: [
-          ...value.mediaFiles,
-          ScreenVideoFile(
-            filePath: path,
-            startedAt: _videoStartedAt ?? DateTime.timestamp(),
-            endedAt: DateTime.timestamp(),
-          ),
-        ],
+        mediaFiles: [...value.mediaFiles, videoFile],
         reportingStage: ViewingReport(),
       );
     } catch (e, s) {

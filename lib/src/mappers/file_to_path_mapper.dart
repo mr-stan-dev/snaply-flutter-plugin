@@ -12,8 +12,7 @@ class FileToPathMapper {
       case ScreenVideoFile():
         return File(file.filePath);
       case ScreenshotFile():
-        final tempFile = File('$appDirPath/${file.fileName}');
-        return await tempFile.writeAsBytes(file.bytes);
+        return File(file.filePath);
       case LogsFile():
         final tempFile = File('$appDirPath/${file.fileName}');
         return await tempFile.writeAsBytes(_toBytes(file.logs));

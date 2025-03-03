@@ -6,22 +6,19 @@ import 'package:snaply/src/entities/report_file.dart';
 class FileToArchiveEntryMapper {
   ArchiveEntry map(ReportFile file) {
     switch (file) {
-      case AttributesFile():
-        return ArchiveEntry.fromBytes(
-          fileName: file.fileName,
-          fileBytes: _toBytes(file.attrs),
-        );
       case ScreenVideoFile():
         return ArchiveEntry.fromPath(filePath: file.filePath);
       case ScreenshotFile():
-        return ArchiveEntry.fromBytes(
-          fileName: file.fileName,
-          fileBytes: file.bytes,
-        );
+        return ArchiveEntry.fromPath(filePath: file.filePath);
       case LogsFile():
         return ArchiveEntry.fromBytes(
           fileName: file.fileName,
           fileBytes: _toBytes(file.logs),
+        );
+      case AttributesFile():
+        return ArchiveEntry.fromBytes(
+          fileName: file.fileName,
+          fileBytes: _toBytes(file.attrs),
         );
     }
   }

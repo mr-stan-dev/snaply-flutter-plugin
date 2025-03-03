@@ -25,12 +25,9 @@ class MediaFilesPreviewLayout extends StatelessWidget {
             ),
             const Spacer(),
             TextButton.icon(
-              onPressed: () => context.act(AddMediaFiles()),
+              onPressed: () => context.act(CaptureMediaFiles()),
               label: const Text('Add'),
-              icon: const Icon(
-                Icons.add,
-                size: 16,
-              ),
+              icon: const Icon(Icons.add, size: 16),
             ),
           ],
         ),
