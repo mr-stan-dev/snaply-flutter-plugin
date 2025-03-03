@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/logger/log_record.dart';
@@ -28,18 +26,16 @@ void main() {
     });
 
     test('maps ScreenshotFile to ArchiveEntry with bytes', () {
-      final bytes = Uint8List.fromList([1, 2, 3]);
       const index = 3;
+      const filePath = 'folder/snaply_screenshot_${index + 1}.png';
       final file = ScreenshotFile(
-        bytes: bytes,
-        index: index,
+        filePath: filePath,
         createdAt: DateTime.now(),
       );
 
       final entry = mapper.map(file);
 
-      expect(entry.fileBytes, equals(bytes));
-      expect(entry.filePath, isNull);
+      expect(entry.filePath, filePath);
       expect(entry.fileName, equals('snaply_screenshot_${index + 1}.png'));
     });
 

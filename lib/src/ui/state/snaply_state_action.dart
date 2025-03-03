@@ -37,7 +37,7 @@ class ViewFileFullScreen extends SnaplyStateAction {
       ];
 }
 
-class AddMediaFiles extends SnaplyStateAction {}
+class CaptureMediaFiles extends SnaplyStateAction {}
 
 class DeleteMediaFile extends SnaplyStateAction {
   DeleteMediaFile(this.fileName);

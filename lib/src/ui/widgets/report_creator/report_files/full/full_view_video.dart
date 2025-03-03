@@ -43,17 +43,9 @@ class _FullViewVideoState extends State<FullViewVideo> {
               Expanded(
                 child: AspectRatio(
                   aspectRatio: _playerController.value.aspectRatio,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: VideoPlayer(_playerController),
-                    ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: VideoPlayer(_playerController),
                   ),
                 ),
               ),

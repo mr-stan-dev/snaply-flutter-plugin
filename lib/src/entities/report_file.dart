@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:snaply/src/logger/log_record.dart';
 
 const videoFileType = 'video';
@@ -7,14 +5,14 @@ const imageFileType = 'image';
 
 sealed class ReportFile {
   const ReportFile({
-    required this.fileName,
     required this.type,
     required this.subtype,
   });
 
-  final String fileName;
   final String type;
   final String subtype;
+
+  String get fileName;
 
   Map<String, String> get metadata;
 
@@ -36,7 +34,6 @@ class ScreenVideoFile extends ReportFile {
     required this.startedAt,
     required this.endedAt,
   }) : super(
-          fileName: 'snaply_screen_video.mp4',
           type: videoFileType,
           subtype: 'mp4',
         );
@@ -44,6 +41,9 @@ class ScreenVideoFile extends ReportFile {
   final String filePath;
   final DateTime startedAt;
   final DateTime endedAt;
+
+  @override
+  String get fileName => Uri.file(filePath).pathSegments.last;
 
   @override
   Map<String, String> get metadata => {
@@ -54,18 +54,24 @@ class ScreenVideoFile extends ReportFile {
 
 class ScreenshotFile extends ReportFile {
   const ScreenshotFile({
-    required this.bytes,
-    required this.index,
+    required this.filePath,
     required this.createdAt,
   }) : super(
-          fileName: 'snaply_screenshot_${index + 1}.png',
           type: imageFileType,
           subtype: 'png',
         );
 
-  final Uint8List bytes;
-  final int index;
+  static String getPath({
+    required String dirPath,
+    required int index,
+  }) =>
+      '$dirPath/snaply_screenshot_${index + 1}.png';
+
+  final String filePath;
   final DateTime createdAt;
+
+  @override
+  String get fileName => Uri.file(filePath).pathSegments.last;
 
   @override
   Map<String, String> get metadata => {
@@ -77,10 +83,12 @@ class LogsFile extends ReportFile {
   const LogsFile({
     required this.logs,
   }) : super(
-          fileName: 'snaply_logs.txt',
           type: 'txt',
           subtype: 'plain',
         );
+
+  @override
+  String get fileName => 'snaply_logs.txt';
 
   final List<LogRecord> logs;
 
@@ -92,10 +100,12 @@ class AttributesFile extends ReportFile {
   const AttributesFile({
     required this.attrs,
   }) : super(
-          fileName: 'snaply_attributes.txt',
           type: 'txt',
           subtype: 'plain',
         );
+
+  @override
+  String get fileName => 'snaply_attributes.txt';
 
   final Map<String, Map<String, String>> attrs;
 

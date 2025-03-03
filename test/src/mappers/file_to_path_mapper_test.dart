@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:snaply/src/entities/report_file.dart';
@@ -36,20 +35,16 @@ void main() {
     });
 
     test('maps ScreenshotFile to new file with bytes', () async {
-      final bytes = Uint8List.fromList([1, 2, 3]);
-      const index = 1;
+      const index = 3;
+      final filePath = '$tempDir/snaply_screenshot_${index + 1}.png';
       final file = ScreenshotFile(
-        bytes: bytes,
-        index: index,
+        filePath: filePath,
         createdAt: DateTime.now(),
       );
 
       final result = await mapper.map(appDirPath: tempDir, file: file);
 
-      expect(
-          result.path, equals('$tempDir/snaply_screenshot_${index + 1}.png'));
-      expect(await result.exists(), isTrue);
-      expect(await result.readAsBytes(), equals(bytes));
+      expect(result.path, equals(filePath));
     });
 
     test('maps AttributesFile to new file with encoded content', () async {

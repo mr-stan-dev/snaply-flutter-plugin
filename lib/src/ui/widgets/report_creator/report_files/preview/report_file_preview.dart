@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/ui/state/snaply_state_action.dart';
@@ -63,8 +65,8 @@ class ReportFilePreview extends StatelessWidget {
         return Stack(
           children: [
             SizedBox.expand(
-              child: Image.memory(
-                f.bytes,
+              child: Image.file(
+                File(f.filePath),
                 fit: BoxFit.cover,
               ),
             ),
