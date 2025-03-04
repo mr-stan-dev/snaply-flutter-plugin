@@ -5,7 +5,7 @@ class ReportUploadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ColoredBox(
       color: Theme.of(context).colorScheme.surface,
       child: Center(
         child: Column(
@@ -13,12 +13,12 @@ class ReportUploadingWidget extends StatelessWidget {
           children: [
             const CircularProgressIndicator(),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Text(
                 'Uploading report',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-            )
+            ),
           ],
         ),
       ),

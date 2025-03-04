@@ -38,7 +38,7 @@ void main() {
   group('ReportCreatorSeverity', () {
     testWidgets('shows all severity options with correct colors',
         (tester) async {
-      await pumpSeverityWidget(tester, SnaplyState.initial);
+      await pumpSeverityWidget(tester, SnaplyState.initial());
 
       for (final severity in Severity.values) {
         final button = find.text(severity.name);
@@ -56,7 +56,7 @@ void main() {
 
     testWidgets('calls act with correct severity when segment selected',
         (tester) async {
-      await pumpSeverityWidget(tester, SnaplyState.initial);
+      await pumpSeverityWidget(tester, SnaplyState.initial());
 
       await tester.tap(find.text('high'));
       verify(() => stateProvider.act(SetSeverity(severity: Severity.high)))
@@ -68,11 +68,12 @@ void main() {
     });
 
     testWidgets('shows current severity as selected', (tester) async {
-      final state = SnaplyState.initial.copyWith(severity: Severity.high);
+      final state = SnaplyState.initial().copyWith(severity: Severity.high);
       await pumpSeverityWidget(tester, state);
 
       final segmentedButton = tester.widget<SegmentedButton<Severity>>(
-          find.byType(SegmentedButton<Severity>));
+        find.byType(SegmentedButton<Severity>),
+      );
       expect(segmentedButton.selected, {Severity.high});
     });
   });

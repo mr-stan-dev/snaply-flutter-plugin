@@ -8,8 +8,8 @@ import 'package:snaply/src/ui/widgets/control_buttons/video_in_progress_button.d
 
 class ControlButtons extends StatelessWidget {
   const ControlButtons({
-    super.key,
     required this.state,
+    super.key,
   });
 
   final SnaplyState state;

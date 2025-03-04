@@ -46,8 +46,8 @@ class MediaFilesPreviewLayout extends StatelessWidget {
   }
 
   List<Widget> _mediaFilesPreview() {
-    List<Widget> widgets = [];
-    for (int i = 0; i < mediaFiles.length; i++) {
+    final widgets = <Widget>[];
+    for (var i = 0; i < mediaFiles.length; i++) {
       widgets.add(ReportFilePreview(index: i, file: mediaFiles[i]));
     }
     return widgets;

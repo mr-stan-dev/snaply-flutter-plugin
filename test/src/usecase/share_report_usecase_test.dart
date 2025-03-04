@@ -19,7 +19,7 @@ class MockArchiveEntryMapper extends Mock implements FileToArchiveEntryMapper {}
 class MockFileToPathMapper extends Mock implements FileToPathMapper {}
 
 void main() {
-  const String tempDir = 'snaply_test_temp_dir';
+  const tempDir = 'snaply_test_temp_dir';
   const videoPath = 'tempDir/video.mp4';
   const screenshotIndex = 2;
   const screenshotPath = '$tempDir/screenshot_${screenshotIndex + 1}.png';
@@ -61,16 +61,18 @@ void main() {
   });
 
   test(
-      'share single file creates a single archive file and calls platform interface with correct path',
-      () async {
+      'share single file creates a single archive file and calls platform '
+      'interface with correct path', () async {
     const archivePath = '$tempDir/snaply_report.tar';
     final videoEntry = ArchiveEntry.fromPath(filePath: videoPath);
 
     when(() => archiveEntryMapper.map(videoFile)).thenReturn(videoEntry);
-    when(() => archiveCreator.create(
-          dirPath: tempDir,
-          entries: [videoEntry],
-        )).thenAnswer((_) async => archivePath);
+    when(
+      () => archiveCreator.create(
+        dirPath: tempDir,
+        entries: [videoEntry],
+      ),
+    ).thenAnswer((_) async => archivePath);
 
     await usecase.call(
       reportFiles: [videoFile],
@@ -102,9 +104,9 @@ void main() {
     // Verify all steps
     verify(() => fileToPathMapper.map(appDirPath: tempDir, file: videoFile))
         .called(1);
-    verify(() =>
-            fileToPathMapper.map(appDirPath: tempDir, file: screenshotFile))
-        .called(1);
+    verify(
+      () => fileToPathMapper.map(appDirPath: tempDir, file: screenshotFile),
+    ).called(1);
     verifyNever(() => archiveEntryMapper.map(videoFile));
     verifyNever(() => archiveEntryMapper.map(screenshotFile));
     verifyNever(

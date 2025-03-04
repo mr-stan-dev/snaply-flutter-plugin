@@ -32,7 +32,7 @@ class ReportCreatorLayout extends StatelessWidget {
         return const SizedBox.shrink();
       case ViewingReport():
         return ReportReviewingWidget(state: state);
-      case ViewingFiles reportState:
+      case final ViewingFiles reportState:
         return ReportFilesFullViewLayout(
           files: reportState.isMediaFiles ? state.mediaFiles : state.extraFiles,
           initialIndex: reportState.index,

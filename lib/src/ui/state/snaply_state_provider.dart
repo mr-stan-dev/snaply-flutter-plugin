@@ -3,12 +3,12 @@ import 'package:snaply/src/ui/state/snaply_state_action.dart';
 
 class SnaplyStateProvider extends InheritedWidget {
   const SnaplyStateProvider({
-    super.key,
     required this.onAction,
     required super.child,
+    super.key,
   });
 
-  final Function(SnaplyStateAction) onAction;
+  final void Function(SnaplyStateAction) onAction;
 
   static SnaplyStateProvider of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<SnaplyStateProvider>()!;

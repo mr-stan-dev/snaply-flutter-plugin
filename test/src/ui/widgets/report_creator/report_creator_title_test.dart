@@ -19,7 +19,7 @@ void main() {
 
   group('ReportCreatorTitle', () {
     testWidgets('shows title label and input field', (tester) async {
-      await pumpTitleWidget(tester, SnaplyState.initial);
+      await pumpTitleWidget(tester, SnaplyState.initial());
 
       expect(find.text('Title'), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
@@ -27,7 +27,7 @@ void main() {
 
     testWidgets('displays existing title in input field', (tester) async {
       const title = 'Test Report';
-      final state = SnaplyState.initial.copyWith(title: title);
+      final state = SnaplyState.initial().copyWith(title: title);
 
       await pumpTitleWidget(tester, state);
 
@@ -35,7 +35,7 @@ void main() {
     });
 
     testWidgets('shows hint text when empty', (tester) async {
-      await pumpTitleWidget(tester, SnaplyState.initial);
+      await pumpTitleWidget(tester, SnaplyState.initial());
 
       expect(find.text('Enter report title'), findsOneWidget);
     });

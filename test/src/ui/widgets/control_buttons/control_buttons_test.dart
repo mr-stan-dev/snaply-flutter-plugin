@@ -24,7 +24,7 @@ void main() {
   group('ControlButtons', () {
     testWidgets('renders idle state correctly', (tester) async {
       final state =
-          SnaplyState.initial.copyWith(controlsState: ControlsState.idle);
+          SnaplyState.initial().copyWith(controlsState: ControlsState.idle);
 
       await pumpControlButtons(tester, state);
 
@@ -34,7 +34,7 @@ void main() {
     });
 
     testWidgets('renders active state with control buttons', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         controlsState: ControlsState.active,
       );
 
@@ -46,7 +46,7 @@ void main() {
     });
 
     testWidgets('renders recording state with progress', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         controlsState: ControlsState.recordingInProgress,
         screenVideoProgressSec: 10,
       );
@@ -59,7 +59,7 @@ void main() {
     });
 
     testWidgets('shows check icon when has mediaFiles', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         controlsState: ControlsState.active,
         mediaFiles: [
           ScreenVideoFile(
@@ -77,7 +77,7 @@ void main() {
     });
 
     testWidgets('is invisible when state is invisible', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         controlsState: ControlsState.invisible,
       );
 

@@ -28,8 +28,8 @@ class _FullViewVideoState extends State<FullViewVideo> {
 
   Future<void> _initPlayer() async {
     await _playerController.initialize();
-    _playerController.play();
-    _playerController.setLooping(true);
+    await _playerController.play();
+    await _playerController.setLooping(true);
     setState(() {
       _isInitialized = true;
     });
@@ -55,7 +55,8 @@ class _FullViewVideoState extends State<FullViewVideo> {
                 allowScrubbing: true,
                 padding: const EdgeInsets.all(8),
                 colors: VideoProgressColors(
-                    playedColor: Theme.of(context).primaryColor),
+                  playedColor: Theme.of(context).primaryColor,
+                ),
               ),
             ],
           )

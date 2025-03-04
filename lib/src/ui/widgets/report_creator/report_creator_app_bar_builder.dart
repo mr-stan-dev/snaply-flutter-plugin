@@ -48,7 +48,7 @@ class ReportCreatorAppBarBuilder {
       case ViewingReport():
       case Loading():
         return 'New report';
-      case ViewingFiles state:
+      case final ViewingFiles state:
         return 'Report ${state.isMediaFiles ? 'media' : 'extra'} files';
     }
   }

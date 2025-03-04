@@ -28,22 +28,26 @@ void main() {
 
     group('video recording', () {
       test('startVideoRecording with Flutter UI capture', () async {
-        when(() => methodChannel.invokeMethod<void>(
-              'startScreenRecordingMethod',
-              {'isMediaProjection': false},
-            )).thenAnswer((_) async => Future.value());
+        when(
+          () => methodChannel.invokeMethod<void>(
+            'startScreenRecordingMethod',
+            {'isMediaProjection': false},
+          ),
+        ).thenAnswer((_) async => Future.value());
 
         await expectLater(
-          platform.startVideoRecording(isMediaProjection: false),
+          platform.startVideoRecording(),
           completes,
         );
       });
 
       test('startVideoRecording with MediaProjection', () async {
-        when(() => methodChannel.invokeMethod<void>(
-              'startScreenRecordingMethod',
-              {'isMediaProjection': true},
-            )).thenAnswer((_) async => Future.value());
+        when(
+          () => methodChannel.invokeMethod<void>(
+            'startScreenRecordingMethod',
+            {'isMediaProjection': true},
+          ),
+        ).thenAnswer((_) async => Future.value());
 
         await expectLater(
           platform.startVideoRecording(isMediaProjection: true),
@@ -53,8 +57,11 @@ void main() {
 
       test('stopVideoRecording returns path', () async {
         const path = '/test/video.mp4';
-        when(() => methodChannel.invokeMethod<String?>(
-            'stopScreenRecordingMethod')).thenAnswer((_) async => path);
+        when(
+          () => methodChannel.invokeMethod<String?>(
+            'stopScreenRecordingMethod',
+          ),
+        ).thenAnswer((_) async => path);
 
         final result = await platform.stopVideoRecording();
         expect(result, path);
@@ -63,18 +70,19 @@ void main() {
 
     test('shareFiles calls method with paths', () async {
       final paths = ['/test/file1.jpg', '/test/file2.mp4'];
-      when(() => methodChannel
-              .invokeMethod<void>('shareFilesMethod', {'filePaths': paths}))
-          .thenAnswer((_) async => Future.value());
+      when(
+        () => methodChannel
+            .invokeMethod<void>('shareFilesMethod', {'filePaths': paths}),
+      ).thenAnswer((_) async => Future.value());
 
       await expectLater(platform.shareFiles(paths), completes);
     });
 
     test('getSnaplyDirectory returns directory path', () async {
       const expectedPath = '/test/path';
-      when(() =>
-              methodChannel.invokeMethod<String?>('getSnaplyDirectoryMethod'))
-          .thenAnswer((_) async => expectedPath);
+      when(
+        () => methodChannel.invokeMethod<String?>('getSnaplyDirectoryMethod'),
+      ).thenAnswer((_) async => expectedPath);
 
       final result = await platform.getSnaplyDirectory();
       expect(result, expectedPath);
@@ -83,10 +91,12 @@ void main() {
     test('getDeviceInfo returns device info map', () async {
       final expectedInfo = {
         'device': {'model': 'test'},
-        'system': {'os': 'test_os'}
+        'system': {'os': 'test_os'},
       };
-      when(() => methodChannel.invokeMethod<Map?>('getDeviceInfoMethod'))
-          .thenAnswer((_) async => expectedInfo);
+      when(
+        () => methodChannel
+            .invokeMethod<Map<dynamic, dynamic>?>('getDeviceInfoMethod'),
+      ).thenAnswer((_) async => expectedInfo);
 
       final result = await platform.getDeviceInfo();
       expect(result, expectedInfo);
@@ -94,24 +104,34 @@ void main() {
 
     group('error handling', () {
       setUp(() {
-        when(() =>
-                methodChannel.invokeMethod<Uint8List?>('takeScreenshotMethod'))
-            .thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
-        when(() => methodChannel.invokeMethod<void>(
-                  'startScreenRecordingMethod',
-                  any(),
-                ))
-            .thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
-        when(() => methodChannel
-                .invokeMethod<String?>('stopScreenRecordingMethod'))
-            .thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
-        when(() => methodChannel.invokeMethod<void>('shareFilesMethod', any()))
-            .thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
-        when(() =>
-                methodChannel.invokeMethod<String?>('getSnaplyDirectoryMethod'))
-            .thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
-        when(() => methodChannel.invokeMethod<Map?>('getDeviceInfoMethod'))
-            .thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
+        when(
+          () => methodChannel.invokeMethod<Uint8List?>('takeScreenshotMethod'),
+        ).thenThrow(
+          PlatformException(code: 'ERROR', message: 'Test error'),
+        );
+        when(
+          () => methodChannel.invokeMethod<void>(
+            'startScreenRecordingMethod',
+            any<bool>(),
+          ),
+        ).thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
+        when(
+          () =>
+              methodChannel.invokeMethod<String?>('stopScreenRecordingMethod'),
+        ).thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
+        when(
+          () => methodChannel.invokeMethod<void>(
+            'shareFilesMethod',
+            any<List<String>>(),
+          ),
+        ).thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
+        when(
+          () => methodChannel.invokeMethod<String?>('getSnaplyDirectoryMethod'),
+        ).thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
+        when(
+          () => methodChannel
+              .invokeMethod<Map<dynamic, dynamic>?>('getDeviceInfoMethod'),
+        ).thenThrow(PlatformException(code: 'ERROR', message: 'Test error'));
       });
 
       test('methods throw on platform exception', () async {
@@ -121,7 +141,7 @@ void main() {
           throwsException,
         );
         await expectLater(
-          platform.startVideoRecording(isMediaProjection: false),
+          platform.startVideoRecording(),
           throwsException,
         );
         await expectLater(platform.stopVideoRecording(), throwsException);

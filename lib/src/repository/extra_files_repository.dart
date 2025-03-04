@@ -4,10 +4,6 @@ import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/platform_interface/snaply_platform_interface.dart';
 
 class ExtraFilesRepository {
-  final SnaplyPlatformInterface _platform;
-  final SnaplyLogger _logger;
-  final CustomAttributesHolder _customAttributesHolder;
-
   const ExtraFilesRepository({
     required SnaplyPlatformInterface platform,
     required SnaplyLogger logger,
@@ -15,6 +11,9 @@ class ExtraFilesRepository {
   })  : _platform = platform,
         _logger = logger,
         _customAttributesHolder = customAttributesHolder;
+  final SnaplyPlatformInterface _platform;
+  final SnaplyLogger _logger;
+  final CustomAttributesHolder _customAttributesHolder;
 
   Future<List<ReportFile>> getExtraFiles({
     required Map<String, Map<String, String>> reportAttrs,
