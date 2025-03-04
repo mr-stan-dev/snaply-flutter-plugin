@@ -8,12 +8,12 @@ sealed class SnaplyStateAction extends Equatable {
 }
 
 class SetControlsVisibility extends SnaplyStateAction {
-  SetControlsVisibility(this.visibility);
+  SetControlsVisibility({required this.isVisible});
 
-  final bool visibility;
+  final bool isVisible;
 
   @override
-  List<Object?> get props => [visibility];
+  List<Object?> get props => [isVisible];
 }
 
 class Activate extends SnaplyStateAction {}
@@ -25,7 +25,10 @@ class ReviewReport extends SnaplyStateAction {}
 class TakeScreenshot extends SnaplyStateAction {}
 
 class ViewFileFullScreen extends SnaplyStateAction {
-  ViewFileFullScreen(this.isMediaFiles, this.index);
+  ViewFileFullScreen({
+    required this.isMediaFiles,
+    required this.index,
+  });
 
   final bool isMediaFiles;
   final int index;

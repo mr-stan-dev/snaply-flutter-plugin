@@ -23,8 +23,12 @@ class ReportFilePreview extends StatelessWidget {
       child: Stack(
         children: [
           InkWell(
-            onTap: () =>
-                context.act(ViewFileFullScreen(file.isMediaFile, index)),
+            onTap: () => context.act(
+              ViewFileFullScreen(
+                isMediaFiles: file.isMediaFile,
+                index: index,
+              ),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -59,9 +63,9 @@ class ReportFilePreview extends StatelessWidget {
 
   Widget _filePreview() {
     switch (file) {
-      case ScreenVideoFile f:
+      case final ScreenVideoFile f:
         return VideoFilePreview(file: f);
-      case ScreenshotFile f:
+      case final ScreenshotFile f:
         return Stack(
           children: [
             SizedBox.expand(
@@ -82,12 +86,12 @@ class ReportFilePreview extends StatelessWidget {
               size: 32,
             ),
             SizedBox(height: 8),
-            Text('Logs')
+            Text('Logs'),
           ],
         );
       case AttributesFile():
         return const Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -99,7 +103,7 @@ class ReportFilePreview extends StatelessWidget {
               Text(
                 'Attributes',
                 textAlign: TextAlign.center,
-              )
+              ),
             ],
           ),
         );

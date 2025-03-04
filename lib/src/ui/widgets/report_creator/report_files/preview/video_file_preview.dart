@@ -112,7 +112,7 @@ class _VideoFilePreviewState extends State<VideoFilePreview> {
           size: 32,
         ),
         SizedBox(height: 8),
-        Text('Video file')
+        Text('Video file'),
       ],
     );
   }

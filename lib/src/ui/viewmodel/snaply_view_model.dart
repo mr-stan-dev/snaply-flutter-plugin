@@ -25,7 +25,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
         _shareReportUsecase = shareReportUsecase,
         _extraFilesRepository = extraFilesRepository,
         _configurationHolder = configurationHolder,
-        super(SnaplyState.initial);
+        super(SnaplyState.initial());
 
   final MediaFilesManager _mediaManager;
   final ShareFilesUsecase _shareReportUsecase;
@@ -47,10 +47,10 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
   Future<void> act(SnaplyStateAction action) async {
     debugPrint('[SnaplyViewModel] act: $action');
     try {
-      _handleAction(action);
+      await _handleAction(action);
     } catch (e, s) {
       // High level error handling. Each action has also its own handling
-      value = SnaplyState.initial;
+      value = SnaplyState.initial();
       _showError(e, s, errorMsg: '$action error');
     }
   }
@@ -58,13 +58,13 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
   Future<void> _handleAction(SnaplyStateAction action) async {
     switch (action) {
       case Activate():
-        value = SnaplyState.initial.copyWith(
+        value = SnaplyState.initial().copyWith(
           controlsState: ControlsState.active,
         );
       case Deactivate():
-        value = SnaplyState.initial;
+        value = SnaplyState.initial();
       case SetControlsVisibility():
-        _handleVisibility(action.visibility);
+        _handleVisibility(action.isVisible);
       case TakeScreenshot():
         await _takeScreenshot();
       case ViewFileFullScreen():
@@ -129,7 +129,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       value = value.copyWith(controlsState: ControlsState.invisible);
       // Delay needed to hide controls before we take a screenshot
       // 30 ms works fine on both android & ios
-      await Future.delayed(screenshotDelay);
+      await Future.delayed(screenshotDelay, () {});
       final index = value.mediaFiles.whereType<ScreenshotFile>().length;
       final screenshot = await _mediaManager.takeScreenshot(index);
       if (screenshot != null) {

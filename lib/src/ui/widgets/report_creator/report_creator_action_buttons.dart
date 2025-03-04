@@ -20,7 +20,7 @@ class ReportCreatorActionButtons extends StatelessWidget {
                 ),
                 onPressed: () => context.act(ShareReport(asArchive: true)),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
                     'Share as 1 archive',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -44,7 +44,7 @@ class ReportCreatorActionButtons extends StatelessWidget {
                 ),
                 onPressed: () => context.act(ShareReport(asArchive: false)),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Text(
                     'Share all files',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(

@@ -82,9 +82,15 @@ void main() {
           .thenThrow(Exception('SnaplyReporterMode can be set only once'));
 
       expect(
-          () => reporter.init(),
-          throwsA(isA<Exception>().having((e) => e.toString(), 'message',
-              contains('SnaplyReporterMode can be set only once'))));
+        () => reporter.init(),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('SnaplyReporterMode can be set only once'),
+          ),
+        ),
+      );
     });
   });
 
@@ -99,16 +105,17 @@ void main() {
       when(() => configHolder.isEnabled).thenReturn(true);
 
       // Now we can perform operations
-      reporter.setVisibility(true);
+      reporter.setVisibility(isVisible: true);
       expect(visibilityNotifier.value, true);
     });
 
     test('disabled reporter performs no operations', () async {
       when(() => configHolder.isEnabled).thenReturn(false);
 
-      reporter.setVisibility(false);
-      reporter.setAttributes({'key': 'value'});
-      reporter.log(message: 'test');
+      reporter
+        ..setVisibility(isVisible: false)
+        ..setAttributes({'key': 'value'})
+        ..log(message: 'test');
 
       expect(visibilityNotifier.value, true);
       verifyNever(() => attributesHolder.addAttributes(any()));
@@ -118,10 +125,10 @@ void main() {
 
   group('SnaplyReporter', () {
     test('setVisibility updates configuration when enabled', () {
-      reporter.setVisibility(true);
+      reporter.setVisibility(isVisible: true);
       expect(visibilityNotifier.value, true);
 
-      reporter.setVisibility(false);
+      reporter.setVisibility(isVisible: false);
       expect(visibilityNotifier.value, false);
     });
 
@@ -145,7 +152,7 @@ void main() {
       when(() => configHolder.isEnabled).thenReturn(false);
 
       final initialValue = visibilityNotifier.value;
-      reporter.setVisibility(true);
+      reporter.setVisibility(isVisible: true);
 
       // Verify the value didn't change
       expect(visibilityNotifier.value, equals(initialValue));
@@ -190,10 +197,10 @@ void main() {
       reporter.log(message: '');
       verify(() => logger.addLog(message: '')).called(1);
 
-      reporter.log(message: 'message with special chars !@#\$%^&*()');
-      verify(() =>
-              logger.addLog(message: 'message with special chars !@#\$%^&*()'))
-          .called(1);
+      reporter.log(message: r'message with special chars !@#$%^&*()');
+      verify(
+        () => logger.addLog(message: r'message with special chars !@#$%^&*()'),
+      ).called(1);
     });
   });
 }

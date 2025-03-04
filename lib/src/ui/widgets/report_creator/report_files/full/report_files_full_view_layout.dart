@@ -32,7 +32,7 @@ class _ReportFilesFullViewLayoutState extends State<ReportFilesFullViewLayout> {
     final List<Widget> pages = widget.files
         .map(
           (f) => Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.all(4),
             child: _fileFullView(f),
           ),
         )
@@ -40,7 +40,7 @@ class _ReportFilesFullViewLayoutState extends State<ReportFilesFullViewLayout> {
 
     if (widget.files.isEmpty) {
       return const Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8),
         child: Center(
           child: Text('No media files attached'),
         ),

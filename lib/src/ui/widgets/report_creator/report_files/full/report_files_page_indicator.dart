@@ -13,7 +13,7 @@ class ReportFilesPageIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(length, (i) => _indicatorItem(context, i)),
@@ -26,7 +26,7 @@ class ReportFilesPageIndicator extends StatelessWidget {
         ? Theme.of(context).primaryColor
         : Colors.transparent;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Container(
         width: 10,
         height: 10,

@@ -1,5 +1,5 @@
-import 'fixed_size_queue.dart';
-import 'log_record.dart';
+import 'package:snaply/src/logger/fixed_size_queue.dart';
+import 'package:snaply/src/logger/log_record.dart';
 
 class SnaplyLogger {
   SnaplyLogger._();

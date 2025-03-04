@@ -32,7 +32,9 @@ void main() {
 
       expect(find.byType(Badge), findsOneWidget);
       expect(
-          find.text('2/${SnaplyState.maxScreenshotsNumber}'), findsOneWidget);
+        find.text('2/${SnaplyState.maxScreenshotsNumber}'),
+        findsOneWidget,
+      );
     });
   });
 }

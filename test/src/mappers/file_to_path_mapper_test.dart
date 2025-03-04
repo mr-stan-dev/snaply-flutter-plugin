@@ -57,7 +57,7 @@ void main() {
       final result = await mapper.map(appDirPath: tempDir, file: file);
 
       expect(result.path, equals('$tempDir/snaply_attributes.txt'));
-      expect(await result.exists(), isTrue);
+      expect(result.existsSync(), isTrue);
       final content = await result.readAsString();
       expect(content, contains('device'));
       expect(content, contains('model'));
@@ -80,7 +80,7 @@ void main() {
       final result = await mapper.map(appDirPath: tempDir, file: file);
 
       expect(result.path, equals('$tempDir/snaply_logs.txt'));
-      expect(await result.exists(), isTrue);
+      expect(result.existsSync(), isTrue);
       final content = await result.readAsString();
       expect(content, contains('log1'));
       expect(content, contains('log2'));

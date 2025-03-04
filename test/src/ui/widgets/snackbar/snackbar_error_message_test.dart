@@ -29,7 +29,7 @@ void main() {
       await pumpErrorMessage(tester, 'error');
 
       final container = tester.widget<Container>(find.byType(Container));
-      final decoration = container.decoration as BoxDecoration;
+      final decoration = container.decoration! as BoxDecoration;
 
       expect(decoration.color, Colors.redAccent.shade100);
       expect(decoration.borderRadius, BorderRadius.circular(16));
@@ -37,7 +37,9 @@ void main() {
 
     testWidgets('handles long error messages', (tester) async {
       const longError =
-          'This is a very long error message that should be truncated when it exceeds the maximum number of lines allowed in the error message display area';
+          'This is a very long error message that should be truncated when '
+          'it exceeds the maximum number of lines allowed in the error '
+          'message display area';
       await pumpErrorMessage(tester, longError);
 
       final text = tester.widget<Text>(find.text(longError));

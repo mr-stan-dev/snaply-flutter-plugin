@@ -16,12 +16,12 @@ class ArchiveCreator {
     required List<ArchiveEntry> entries,
   }) async {
     if (entries.isEmpty) {
-      throw Exception("No archive entries provided.");
+      throw Exception('No archive entries provided.');
     }
 
-    final String outputPath = '$dirPath/$_reportFilename';
+    final outputPath = '$dirPath/$_reportFilename';
     await _archiveEntries(entries, outputPath);
-    debugPrint("TAR archive created at $outputPath");
+    debugPrint('TAR archive created at $outputPath');
     return outputPath;
   }
 
@@ -31,12 +31,12 @@ class ArchiveCreator {
       return entry.fileBytes!;
     } else if (entry.filePath != null) {
       final file = File(entry.filePath!);
-      if (!await file.exists()) {
-        throw Exception("Input file does not exist: ${entry.filePath}");
+      if (!file.existsSync()) {
+        throw Exception('Input file does not exist: ${entry.filePath}');
       }
-      return await file.readAsBytes();
+      return file.readAsBytes();
     } else {
-      throw Exception("No file data provided for ${entry.fileName}");
+      throw Exception('No file data provided for ${entry.fileName}');
     }
   }
 
@@ -46,18 +46,19 @@ class ArchiveCreator {
     // File name (100 bytes)
     final nameBytes = utf8.encode(fileName);
     if (nameBytes.length > 100) {
-      throw Exception("File name too long: $fileName");
+      throw Exception('File name too long: $fileName');
     }
-    header.setRange(0, nameBytes.length, nameBytes);
+    header
+      ..setRange(0, nameBytes.length, nameBytes)
 
-    // File mode (8 bytes) - "0000644 "
-    header.setRange(100, 108, utf8.encode('0000644 '));
+      // File mode (8 bytes) - "0000644 "
+      ..setRange(100, 108, utf8.encode('0000644 '))
 
-    // Owner's numeric user ID (8 bytes)
-    header.setRange(108, 116, utf8.encode('0000000 '));
+      // Owner's numeric user ID (8 bytes)
+      ..setRange(108, 116, utf8.encode('0000000 '))
 
-    // Group's numeric user ID (8 bytes)
-    header.setRange(116, 124, utf8.encode('0000000 '));
+      // Group's numeric user ID (8 bytes)
+      ..setRange(116, 124, utf8.encode('0000000 '));
 
     // File size in octal (12 bytes)
     final sizeString = '${fileSize.toRadixString(8).padLeft(11, '0')} ';
@@ -68,17 +69,18 @@ class ArchiveCreator {
         .toRadixString(8)
         .padLeft(11, '0');
     final mtimeString = '$mtime ';
-    header.setRange(136, 148, utf8.encode(mtimeString));
+    header
+      ..setRange(136, 148, utf8.encode(mtimeString))
 
-    // Checksum placeholder (8 bytes)
-    header.setRange(148, 156, utf8.encode('        '));
+      // Checksum placeholder (8 bytes)
+      ..setRange(148, 156, utf8.encode('        '));
 
     // Type flag (1 byte) - '0' for regular file
     header[156] = '0'.codeUnitAt(0);
 
     // Calculate checksum
-    int checksum = 0;
-    for (int i = 0; i < 512; i++) {
+    var checksum = 0;
+    for (var i = 0; i < 512; i++) {
       checksum += header[i];
     }
 
@@ -103,10 +105,9 @@ class ArchiveCreator {
 
         // Write header
         final header = _createTarHeader(entry.fileName, fileBytes.length);
-        sink.add(header);
-
-        // Write file data
-        sink.add(fileBytes);
+        sink
+          ..add(header)
+          ..add(fileBytes);
 
         // Pad to 512-byte boundary
         final padding = 512 - (fileBytes.length % 512);

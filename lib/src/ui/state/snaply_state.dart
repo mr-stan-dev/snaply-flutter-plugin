@@ -15,6 +15,18 @@ class SnaplyState extends Equatable {
     required this.severity,
   });
 
+  factory SnaplyState.initial() => SnaplyState(
+        controlsState: ConfigurationHolder.instance.isVisible
+            ? ControlsState.idle
+            : ControlsState.invisible,
+        title: '',
+        screenVideoProgressSec: 0,
+        mediaFiles: const [],
+        extraFiles: const [],
+        reportingStage: Gathering(),
+        severity: Severity.medium,
+      );
+
   static const maxVideoSec = 60;
   static const maxVideosNumber = 1;
   static const maxScreenshotsNumber = 10;
@@ -48,20 +60,8 @@ class SnaplyState extends Equatable {
         'report': {
           'title': title,
           'severity': severity.name,
-        }
+        },
       };
-
-  static get initial => SnaplyState(
-        controlsState: ConfigurationHolder.instance.isVisible
-            ? ControlsState.idle
-            : ControlsState.invisible,
-        title: '',
-        screenVideoProgressSec: 0,
-        mediaFiles: const [],
-        extraFiles: const [],
-        reportingStage: Gathering(),
-        severity: Severity.medium,
-      );
 
   SnaplyState copyWith({
     ControlsState? controlsState,
@@ -104,6 +104,6 @@ enum ControlsState {
   recordingInProgress,
   invisible;
 
-  static ControlsState fromVisibility(bool visibility) =>
-      visibility ? ControlsState.idle : ControlsState.invisible;
+  static ControlsState fromVisibility({required bool isVisible}) =>
+      isVisible ? ControlsState.idle : ControlsState.invisible;
 }

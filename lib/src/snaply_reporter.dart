@@ -6,9 +6,9 @@ import 'package:snaply/src/snaply_reporter_mode.dart';
 
 /// A reporter interface for managing bug reporting functionality.
 ///
-/// The SnaplyReporter provides functionality for capturing and sharing bug reports
-/// with screenshots, screen recordings, device information, and logs. Access the
-/// singleton instance through [instance].
+/// The SnaplyReporter provides functionality for capturing and sharing
+/// bug reports with screenshots, screen recordings, device information,
+/// and logs. Access the singleton instance through [instance].
 ///
 /// To enable/disable at compile time:
 /// ```sh
@@ -39,8 +39,8 @@ abstract interface class SnaplyReporter {
 
   /// Whether the reporter is enabled.
   ///
-  /// When disabled, all operations become no-ops. This can be controlled at compile
-  /// time using the SNAPLY_ENABLED flag.
+  /// When disabled, all operations become no-ops. This can be controlled
+  /// at compile time using the SNAPLY_ENABLED flag.
   bool get isEnabled;
 
   /// Initializes the reporter with optional [mode].
@@ -53,9 +53,9 @@ abstract interface class SnaplyReporter {
   /// Has no effect if report gathering or reviewing is in progress.
   /// ```dart
   /// // Hide the report button
-  /// SnaplyReporter.instance.setVisibility(false);
+  /// SnaplyReporter.instance.setVisibility(isVisible: false);
   /// ```
-  void setVisibility(bool visibility);
+  void setVisibility({required bool isVisible});
 
   /// Sets custom attributes to be included in bug reports.
   ///

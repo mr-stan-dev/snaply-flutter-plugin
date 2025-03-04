@@ -66,8 +66,9 @@ class _ReportCreatorTitleState extends State<ReportCreatorTitle> {
 
   @override
   void dispose() {
-    _controller.removeListener(_onTextChanged);
-    _controller.dispose();
+    _controller
+      ..removeListener(_onTextChanged)
+      ..dispose();
     super.dispose();
   }
 }

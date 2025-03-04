@@ -8,8 +8,7 @@ class ConfigurationHolder {
 
   static ConfigurationHolder get instance => _instance;
 
-  static const String _envConfig =
-      String.fromEnvironment("SNAPLY_CONFIG", defaultValue: '');
+  static const String _envConfig = String.fromEnvironment('SNAPLY_CONFIG');
 
   static final List<String> _configValues = _envConfig.split(';');
 

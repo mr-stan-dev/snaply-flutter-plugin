@@ -34,7 +34,7 @@ class _SnackbarRootLayoutState extends State<SnackbarRootLayout>
   );
 
   late final _slideAnimationOffset = Tween<Offset>(
-    begin: const Offset(0.0, 0.2),
+    begin: const Offset(0, 0.2),
     end: Offset.zero,
   ).animate(
     CurvedAnimation(
@@ -120,8 +120,9 @@ class _SnackbarRootLayoutState extends State<SnackbarRootLayout>
   void dispose() {
     _uiEventsSubscription?.cancel();
     _uiEventsSubscription = null;
-    _opacityController.removeStatusListener(_handleAnimationStatus);
-    _opacityController.dispose();
+    _opacityController
+      ..removeStatusListener(_handleAnimationStatus)
+      ..dispose();
     fadeOutTimer?.cancel();
     super.dispose();
   }

@@ -19,7 +19,7 @@ class _SnaplyRootWidgetState extends State<SnaplyRootWidget> {
   @override
   Widget build(BuildContext context) {
     return SnaplyStateProvider(
-      onAction: (action) => _viewModel.act(action),
+      onAction: _viewModel.act,
       child: ValueListenableBuilder(
         valueListenable: _viewModel,
         builder: (context, state, _) => Stack(

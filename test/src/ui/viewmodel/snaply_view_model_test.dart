@@ -53,7 +53,7 @@ void main() {
 
   // Helper method to wait for events
   Future<void> pumpEvents() async {
-    await Future.delayed(Duration.zero);
+    await Future.delayed(Duration.zero, () {});
   }
 
   group('screenshots', () {
@@ -88,9 +88,9 @@ void main() {
 
       expect(viewModel.value.mediaFiles, isEmpty);
       expect(uiEvents.last, isA<ErrorEvent>());
-      verify(() =>
-              mediaManager.takeScreenshot(viewModel.value.mediaFiles.length))
-          .called(1);
+      verify(
+        () => mediaManager.takeScreenshot(viewModel.value.mediaFiles.length),
+      ).called(1);
     });
 
     test('screenshots limit prevents taking more', () async {
@@ -111,7 +111,8 @@ void main() {
       await pumpEvents();
 
       verifyNever(
-          () => mediaManager.takeScreenshot(viewModel.value.mediaFiles.length));
+        () => mediaManager.takeScreenshot(viewModel.value.mediaFiles.length),
+      );
       expect((uiEvents.last as PlainInfo).infoMsg, contains('limit reached'));
     });
   });
@@ -122,16 +123,22 @@ void main() {
         'Then start recording calls media manager with media projection true',
         () async {
       const isMediaProjection = true;
-      when(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).thenAnswer((_) async => {});
+      when(
+        () => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection,
+        ),
+      ).thenAnswer((_) async => {});
       when(() => configurationHolder.useMediaProjection)
           .thenReturn(isMediaProjection);
 
       await viewModel.act(StartVideoRecording());
 
       expect(viewModel.value.controlsState, ControlsState.recordingInProgress);
-      verify(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).called(1);
+      verify(
+        () => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection,
+        ),
+      ).called(1);
     });
 
     test(
@@ -139,16 +146,18 @@ void main() {
         'Then start recording calls media manager with media projection false',
         () async {
       const isMediaProjection = false;
-      when(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).thenAnswer((_) async => {});
+      when(
+        () => mediaManager.startVideoRecording(),
+      ).thenAnswer((_) async => {});
       when(() => configurationHolder.useMediaProjection)
           .thenReturn(isMediaProjection);
 
       await viewModel.act(StartVideoRecording());
 
       expect(viewModel.value.controlsState, ControlsState.recordingInProgress);
-      verify(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).called(1);
+      verify(
+        () => mediaManager.startVideoRecording(),
+      ).called(1);
     });
 
     test('stop recording adds video file', () async {
@@ -189,9 +198,7 @@ void main() {
       );
       expect(uiEvents.last, isA<ErrorEvent>());
       verify(
-        () => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection,
-        ),
+        () => mediaManager.startVideoRecording(),
       ).called(1);
     });
   });
@@ -205,10 +212,13 @@ void main() {
 
       final extraFiles = [
         LogsFile(
-            logs: [LogRecord(message: 'test log', timestamp: DateTime.now())]),
-        const AttributesFile(attrs: {
-          'test': {'key': 'value'}
-        }),
+          logs: [LogRecord(message: 'test log', timestamp: DateTime.now())],
+        ),
+        const AttributesFile(
+          attrs: {
+            'test': {'key': 'value'},
+          },
+        ),
       ];
 
       // Set initial state with title and severity
@@ -226,9 +236,11 @@ void main() {
         ),
       ).thenAnswer((_) => Future.value());
 
-      when(() => extraFilesRepository.getExtraFiles(
-            reportAttrs: any(named: 'reportAttrs'),
-          )).thenAnswer((_) async => extraFiles);
+      when(
+        () => extraFilesRepository.getExtraFiles(
+          reportAttrs: any(named: 'reportAttrs'),
+        ),
+      ).thenAnswer((_) async => extraFiles);
 
       await viewModel.act(ShareReport(asArchive: true));
       await pumpEvents();

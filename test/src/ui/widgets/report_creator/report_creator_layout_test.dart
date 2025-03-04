@@ -20,7 +20,7 @@ void main() {
 
   group('ReportCreatorLayout', () {
     testWidgets('shows nothing in gathering state', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         reportingStage: Gathering(),
       );
 
@@ -31,7 +31,7 @@ void main() {
 
     testWidgets('shows reviewing widget in viewing report state',
         (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         reportingStage: ViewingReport(),
       );
 
@@ -41,7 +41,7 @@ void main() {
     });
 
     testWidgets('shows uploading widget in loading state', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         reportingStage: Loading(),
       );
 
