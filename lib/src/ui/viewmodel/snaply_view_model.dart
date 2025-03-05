@@ -204,7 +204,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
     final newMediaFiles = [...value.mediaFiles];
     final fileToRemove =
         value.mediaFiles.firstWhere((f) => f.fileName == fileName);
-    final isVideo = fileToRemove.type == videoFileType;
+    final isVideo = fileToRemove is ScreenVideoFile;
     if (isVideo) {
       _resetVideoState();
     }

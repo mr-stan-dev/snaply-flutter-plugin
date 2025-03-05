@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:snaply/src/entities/report_file.dart';
+import 'package:snaply/src/ui/widgets/report_creator/report_files/preview/delete_media_file_button.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoFilePreview extends StatefulWidget {
-  const VideoFilePreview({
+class PreviewVideoFile extends StatefulWidget {
+  const PreviewVideoFile({
     required this.file,
     super.key,
   });
@@ -13,10 +14,10 @@ class VideoFilePreview extends StatefulWidget {
   final ScreenVideoFile file;
 
   @override
-  State<VideoFilePreview> createState() => _VideoFilePreviewState();
+  State<PreviewVideoFile> createState() => _PreviewVideoFileState();
 }
 
-class _VideoFilePreviewState extends State<VideoFilePreview> {
+class _PreviewVideoFileState extends State<PreviewVideoFile> {
   VideoPlayerController? _controller;
   bool _hasFrame = false;
 
@@ -89,6 +90,11 @@ class _VideoFilePreviewState extends State<VideoFilePreview> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: DeleteMediaFileButton(mediaFile: widget.file),
           ),
         ],
       );
