@@ -71,7 +71,7 @@ class _PreviewVideoFileState extends State<PreviewVideoFile> {
             ),
           ),
           // Dimming overlay
-          Container(color: Colors.black.withOpacity(0.3)),
+          Container(color: Colors.black.withValues(alpha: 0.3)),
           const Center(
             child: Icon(
               Icons.play_circle_outline,
