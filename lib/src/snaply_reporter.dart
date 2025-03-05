@@ -4,77 +4,47 @@ import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
 import 'package:snaply/src/snaply_reporter_mode.dart';
 
-/// A reporter interface for managing bug reporting functionality.
+/// Interface for capturing and managing bug reports with rich context.
 ///
-/// The SnaplyReporter provides functionality for capturing and sharing
-/// bug reports with screenshots, screen recordings, device information,
-/// and logs. Access the singleton instance through [instance].
-///
-/// To enable/disable at compile time:
-/// ```sh
-/// flutter run --dart-define=SNAPLY_ENABLED=true
-/// ```
-///
-/// Example usage:
-/// ```dart
-/// // Initialize with default mode
-/// await SnaplyReporter.instance.init();
-///
-/// // Add custom attributes
-/// SnaplyReporter.instance.setAttributes({
-///   'user_id': '12345',
-///   'app_version': '1.0.0',
-/// });
-///
-/// // Add logs
-/// SnaplyReporter.instance.log(message: 'User completed onboarding');
-/// ```
+/// Provides functionality for screenshots, recordings, logs, and device info.
+/// Access through [instance]. See package documentation for setup and examples.
 abstract interface class SnaplyReporter {
-  /// Singleton instance of [SnaplyReporter].
+  /// Singleton instance with default configuration.
   static final SnaplyReporter instance = SnaplyReporterImpl(
     configHolder: ConfigurationHolder.instance,
     attributesHolder: CustomAttributesHolder.instance,
     logger: SnaplyLogger.instance,
   );
 
-  /// Whether the reporter is enabled.
+  /// Whether the reporter is currently enabled.
   ///
-  /// When disabled, all operations become no-ops. This can be controlled
-  /// at compile time using the SNAPLY_ENABLED flag.
+  /// The reporter is enabled after successful initialization via [init].
+  /// When disabled:
+  /// * All operations become no-ops
+  /// * No resources are allocated
+  /// * No UI elements are shown
+  /// * No data is collected or stored
   bool get isEnabled;
 
-  /// Initializes the reporter with optional [mode].
+  /// Initializes the reporter with optional reporting [mode].
   ///
-  /// Call this before using any other reporter functionality.
+  /// Default mode is [SharingFilesMode].
   Future<void> init({SnaplyReporterMode? mode});
 
-  /// Controls visibility of the report activation button.
+  /// Controls report activation button visibility.
   ///
-  /// Has no effect if report gathering or reviewing is in progress.
-  /// ```dart
-  /// // Hide the report button
-  /// SnaplyReporter.instance.setVisibility(isVisible: false);
-  /// ```
+  /// No effect during active report gathering/reviewing or when disabled.
   void setVisibility({required bool isVisible});
 
-  /// Sets custom attributes to be included in bug reports.
+  /// Sets custom key-value attributes for bug reports.
   ///
-  /// These attributes will be included alongside automatically collected
-  /// device and system information.
-  /// ```dart
-  /// SnaplyReporter.instance.setAttributes({
-  ///   'user_id': '12345',
-  ///   'environment': 'production',
-  /// });
-  /// ```
+  /// Replaces any previously set attributes. Values are included alongside
+  /// automatically collected device and system information.
   void setAttributes(Map<String, String> attributes);
 
-  /// Adds a timestamped log message to the report.
+  /// Adds a timestamped message to logs file.
   ///
-  /// Use this to capture important events or state changes that may be
-  /// relevant for debugging.
-  /// ```dart
-  /// SnaplyReporter.instance.log(message: 'Payment transaction completed');
-  /// ```
+  /// Use for capturing important events, state changes, or debug context.
+  /// Messages are automatically timestamped when added.
   void log({required String message});
 }
