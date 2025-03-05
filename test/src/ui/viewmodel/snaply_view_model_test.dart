@@ -100,7 +100,8 @@ void main() {
           mediaFiles: [
             ...viewModel.value.mediaFiles,
             ScreenshotFile(
-              filePath: ScreenshotFile.getPath(dirPath: 'dirPath', index: i),
+              filePath:
+                  ScreenshotFile.getFullPath(dirPath: 'dirPath', index: i),
               createdAt: DateTime.now(),
             ),
           ],

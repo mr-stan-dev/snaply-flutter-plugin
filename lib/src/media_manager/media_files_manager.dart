@@ -12,7 +12,7 @@ class MediaFilesManager {
     final bytes = await _platform.takeScreenshot();
     if (bytes != null) {
       final snaplyDirPath = await _platform.getSnaplyDirectory();
-      final filePath = ScreenshotFile.getPath(
+      final filePath = ScreenshotFile.getFullPath(
         dirPath: snaplyDirPath,
         index: index,
       );
