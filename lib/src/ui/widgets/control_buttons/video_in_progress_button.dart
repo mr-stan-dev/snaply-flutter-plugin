@@ -23,7 +23,6 @@ class VideoInProgressButton extends StatelessWidget {
           ),
           Positioned.fill(
             child: Align(
-              alignment: Alignment.center,
               child: Icon(
                 Icons.stop_rounded,
                 color: Theme.of(context).colorScheme.primary,

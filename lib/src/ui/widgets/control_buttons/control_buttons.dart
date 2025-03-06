@@ -8,8 +8,8 @@ import 'package:snaply/src/ui/widgets/control_buttons/video_in_progress_button.d
 
 class ControlButtons extends StatelessWidget {
   const ControlButtons({
-    super.key,
     required this.state,
+    super.key,
   });
 
   final SnaplyState state;
@@ -25,7 +25,9 @@ class ControlButtons extends StatelessWidget {
         visible: state.controlsState != ControlsState.invisible,
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.onSurface.withValues(
+                  alpha: 0.3,
+                ),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(

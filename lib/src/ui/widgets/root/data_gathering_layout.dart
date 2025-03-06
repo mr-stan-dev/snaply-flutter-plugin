@@ -7,8 +7,8 @@ import 'package:snaply/src/ui/widgets/control_buttons/control_buttons.dart';
 
 class DataGatheringLayout extends StatefulWidget {
   const DataGatheringLayout({
-    super.key,
     required this.state,
+    super.key,
   });
 
   final SnaplyState state;
@@ -36,23 +36,26 @@ class _DataGatheringLayoutState extends State<DataGatheringLayout> {
 
   void _onVisibilityChanged() {
     context.act(
-      SetControlsVisibility(ConfigurationHolder.instance.isVisible),
+      SetControlsVisibility(isVisible: ConfigurationHolder.instance.isVisible),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          right: _xPos,
-          bottom: _yPos,
-          child: GestureDetector(
-            onPanUpdate: _onPanUpdate,
-            child: ControlButtons(state: widget.state),
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      child: Stack(
+        children: [
+          Positioned(
+            right: _xPos,
+            bottom: _yPos,
+            child: GestureDetector(
+              onPanUpdate: _onPanUpdate,
+              child: ControlButtons(state: widget.state),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

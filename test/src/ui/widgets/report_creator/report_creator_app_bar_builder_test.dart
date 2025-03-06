@@ -22,7 +22,7 @@ void main() {
 
   group('ReportCreatorAppBarBuilder', () {
     testWidgets('shows correct title for viewing report state', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         reportingStage: ViewingReport(),
       );
 
@@ -33,7 +33,7 @@ void main() {
     });
 
     testWidgets('shows correct title for viewing files state', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         reportingStage: ViewingFiles(isMediaFiles: true, index: 0),
       );
 
@@ -44,7 +44,7 @@ void main() {
     });
 
     testWidgets('shows no app bar in gathering state', (tester) async {
-      final state = SnaplyState.initial.copyWith(
+      final state = SnaplyState.initial().copyWith(
         reportingStage: Gathering(),
       );
 

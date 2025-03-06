@@ -14,48 +14,40 @@ class MediaFilesPreviewLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (mediaFiles.isEmpty) {
-      return const Center(
-        child: Text('No media files attached'),
-      );
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Text(
-              'Media files',
+              mediaFiles.isNotEmpty ? 'Media files' : 'No media files',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Spacer(),
             TextButton.icon(
-              onPressed: () => context.act(AddMediaFiles()),
+              onPressed: () => context.act(CaptureMediaFiles()),
               label: const Text('Add'),
-              icon: const Icon(
-                Icons.add,
-                size: 16,
-              ),
+              icon: const Icon(Icons.add, size: 16),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: _mediaFilesPreview(),
+        if (mediaFiles.isNotEmpty)
+          SizedBox(
+            height: 120,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: _mediaFilesPreview(),
+            ),
           ),
-        ),
         const SizedBox(height: 16),
       ],
     );
   }
 
   List<Widget> _mediaFilesPreview() {
-    List<Widget> widgets = [];
-    for (int i = 0; i < mediaFiles.length; i++) {
+    final widgets = <Widget>[];
+    for (var i = 0; i < mediaFiles.length; i++) {
       widgets.add(ReportFilePreview(index: i, file: mediaFiles[i]));
     }
     return widgets;

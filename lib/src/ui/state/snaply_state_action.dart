@@ -8,12 +8,12 @@ sealed class SnaplyStateAction extends Equatable {
 }
 
 class SetControlsVisibility extends SnaplyStateAction {
-  SetControlsVisibility(this.visibility);
+  SetControlsVisibility({required this.isVisible});
 
-  final bool visibility;
+  final bool isVisible;
 
   @override
-  List<Object?> get props => [visibility];
+  List<Object?> get props => [isVisible];
 }
 
 class Activate extends SnaplyStateAction {}
@@ -25,16 +25,31 @@ class ReviewReport extends SnaplyStateAction {}
 class TakeScreenshot extends SnaplyStateAction {}
 
 class ViewFileFullScreen extends SnaplyStateAction {
-  ViewFileFullScreen(this.isMediaFiles, this.index);
+  ViewFileFullScreen({
+    required this.isMediaFiles,
+    required this.index,
+  });
 
   final bool isMediaFiles;
   final int index;
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        isMediaFiles,
+        index,
+      ];
 }
 
-class AddMediaFiles extends SnaplyStateAction {}
+class CaptureMediaFiles extends SnaplyStateAction {}
+
+class DeleteMediaFile extends SnaplyStateAction {
+  DeleteMediaFile(this.fileName);
+
+  final String fileName;
+
+  @override
+  List<Object?> get props => [fileName];
+}
 
 class UpdateReportTitle extends SnaplyStateAction {
   UpdateReportTitle(this.title);
@@ -42,7 +57,7 @@ class UpdateReportTitle extends SnaplyStateAction {
   final String title;
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [title];
 }
 
 class StartVideoRecording extends SnaplyStateAction {}

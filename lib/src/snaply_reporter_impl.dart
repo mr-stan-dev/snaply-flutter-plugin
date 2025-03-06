@@ -27,8 +27,8 @@ class SnaplyReporterImpl implements SnaplyReporter {
   bool get isEnabled => _configHolder.isEnabled;
 
   @override
-  void setVisibility(bool visibility) {
-    _runIfEnabled(() => _configHolder.visibility.value = visibility);
+  void setVisibility({required bool isVisible}) {
+    _runIfEnabled(() => _configHolder.visibility.value = isVisible);
   }
 
   @override

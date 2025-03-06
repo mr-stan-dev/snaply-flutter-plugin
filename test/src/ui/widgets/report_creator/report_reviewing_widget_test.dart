@@ -22,7 +22,7 @@ void main() {
 
   group('ReportReviewingWidget', () {
     testWidgets('renders all required components', (tester) async {
-      final state = SnaplyState.initial;
+      final state = SnaplyState.initial();
 
       await pumpReportReviewingWidget(tester, state);
 
@@ -32,7 +32,7 @@ void main() {
     });
 
     testWidgets('shows dividers between sections', (tester) async {
-      await pumpReportReviewingWidget(tester, SnaplyState.initial);
+      await pumpReportReviewingWidget(tester, SnaplyState.initial());
 
       expect(find.byType(Divider), findsNWidgets(3));
     });

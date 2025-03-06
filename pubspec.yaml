@@ -1,26 +1,32 @@
 name: snaply
 description: A Flutter plugin for instant bug reports with screenshots, screen recordings, device environment and logs.
-version: 0.0.1-alpha.3
+version: 0.0.1-alpha.4
 repository: https://github.com/mr-stan-dev/snaply-flutter-plugin
 issue_tracker: https://github.com/mr-stan-dev/snaply-flutter-plugin/issues
 homepage: https://snaply.dev
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.10.0"
+  flutter: ">=3.29.0"
 
 dependencies:
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
-  equatable: ^2.0.5
-  video_player: ^2.9.2
   plugin_platform_interface: ^2.0.2
+  video_player: ^2.9.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  husky: ^0.1.7
   mocktail: ^1.0.4
+  very_good_analysis: ^5.1.0
+
+scripts:
+  prepare: husky install
+  pre-push: "dart format --set-exit-if-changed . && flutter analyze && flutter test"
+  tag: "git tag v$(grep 'version: ' pubspec.yaml | cut -d ' ' -f 2) && git push --tags"
 
 flutter:
   plugin:

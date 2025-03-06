@@ -19,7 +19,7 @@ class FullViewLogs extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Row(
               children: [
                 Text(
@@ -35,7 +35,7 @@ class FullViewLogs extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Container(
+            child: ColoredBox(
               color: Theme.of(context).colorScheme.surfaceContainer,
               child: ListView.builder(
                 itemCount: logsFile.logs.length,
@@ -43,8 +43,8 @@ class FullViewLogs extends StatelessWidget {
                   final log = logsFile.logs[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -24,9 +24,15 @@ void main() {
 
       test('mode throws when accessed before being set', () {
         expect(
-            () => ConfigurationHolder.instance.mode,
-            throwsA(isA<Exception>().having((e) => e.toString(), 'message',
-                contains('Attempt to get mode when it is not enabled'))));
+          () => ConfigurationHolder.instance.mode,
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Attempt to get mode when it is not enabled'),
+            ),
+          ),
+        );
       });
 
       test('setMode sets mode and enables holder', () {
@@ -38,9 +44,15 @@ void main() {
 
       test('setMode throws when called twice', () {
         expect(
-            () => ConfigurationHolder.instance.setMode(SharingFilesMode()),
-            throwsA(isA<Exception>().having((e) => e.toString(), 'message',
-                contains('SnaplyReporterMode can be set only once'))));
+          () => ConfigurationHolder.instance.setMode(SharingFilesMode()),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('SnaplyReporterMode can be set only once'),
+            ),
+          ),
+        );
       });
     });
 

@@ -19,15 +19,17 @@ class _SnaplyRootWidgetState extends State<SnaplyRootWidget> {
   @override
   Widget build(BuildContext context) {
     return SnaplyStateProvider(
-      onAction: (action) => _viewModel.act(action),
-      child: Stack(
-        children: [
-          ValueListenableBuilder(
-            valueListenable: _viewModel,
-            builder: (context, state, _) => _fullScreenWidget(state),
-          ),
-          SnackbarRootLayout(_viewModel.uiEventsStream),
-        ],
+      onAction: _viewModel.act,
+      child: ValueListenableBuilder(
+        valueListenable: _viewModel,
+        builder: (context, state, _) => Stack(
+          children: [
+            Positioned.fill(
+              child: _fullScreenWidget(state),
+            ),
+            SnackbarRootLayout(_viewModel.uiEventsStream),
+          ],
+        ),
       ),
     );
   }

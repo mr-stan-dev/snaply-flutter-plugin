@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
@@ -37,9 +35,11 @@ void main() {
     extraFilesRepository = MockExtraFilesRepository();
     configurationHolder = MockConfigurationHolder();
 
-    when(() => extraFilesRepository.getExtraFiles(
-          reportAttrs: any(named: 'reportAttrs'),
-        )).thenAnswer((_) async => <ReportFile>[]);
+    when(
+      () => extraFilesRepository.getExtraFiles(
+        reportAttrs: any(named: 'reportAttrs'),
+      ),
+    ).thenAnswer((_) async => <ReportFile>[]);
 
     viewModel = SnaplyViewModel(
       mediaManager: mediaManager,
@@ -53,14 +53,19 @@ void main() {
 
   // Helper method to wait for events
   Future<void> pumpEvents() async {
-    await Future.delayed(Duration.zero);
+    await Future.delayed(Duration.zero, () {});
   }
 
   group('screenshots', () {
     test('take screenshot success adds file and updates state', () async {
       viewModel.screenshotDelay = Duration.zero;
-      final bytes = Uint8List.fromList(List.generate(10, (i) => i));
-      when(() => mediaManager.takeScreenshot()).thenAnswer((_) async => bytes);
+      const index = 0;
+      final screenshotFile = ScreenshotFile(
+        filePath: 'filePath',
+        createdAt: DateTime.timestamp(),
+      );
+      when(() => mediaManager.takeScreenshot(index))
+          .thenAnswer((_) async => screenshotFile);
 
       await viewModel.act(TakeScreenshot());
       await pumpEvents();
@@ -70,12 +75,12 @@ void main() {
       expect(viewModel.value.reportingStage, isA<Gathering>());
       expect(uiEvents.last, isA<PlainInfo>());
 
-      verify(() => mediaManager.takeScreenshot()).called(1);
+      verify(() => mediaManager.takeScreenshot(index)).called(1);
     });
 
     test('take screenshot error shows error message', () async {
       viewModel.screenshotDelay = Duration.zero;
-      when(() => mediaManager.takeScreenshot())
+      when(() => mediaManager.takeScreenshot(viewModel.value.mediaFiles.length))
           .thenThrow(Exception('Screenshot failed'));
 
       await viewModel.act(TakeScreenshot());
@@ -83,7 +88,9 @@ void main() {
 
       expect(viewModel.value.mediaFiles, isEmpty);
       expect(uiEvents.last, isA<ErrorEvent>());
-      verify(() => mediaManager.takeScreenshot()).called(1);
+      verify(
+        () => mediaManager.takeScreenshot(viewModel.value.mediaFiles.length),
+      ).called(1);
     });
 
     test('screenshots limit prevents taking more', () async {
@@ -93,8 +100,8 @@ void main() {
           mediaFiles: [
             ...viewModel.value.mediaFiles,
             ScreenshotFile(
-              index: i,
-              bytes: Uint8List.fromList(List.generate(10, (i) => i)),
+              filePath:
+                  ScreenshotFile.getFullPath(dirPath: 'dirPath', index: i),
               createdAt: DateTime.now(),
             ),
           ],
@@ -104,7 +111,9 @@ void main() {
       await viewModel.act(TakeScreenshot());
       await pumpEvents();
 
-      verifyNever(() => mediaManager.takeScreenshot());
+      verifyNever(
+        () => mediaManager.takeScreenshot(viewModel.value.mediaFiles.length),
+      );
       expect((uiEvents.last as PlainInfo).infoMsg, contains('limit reached'));
     });
   });
@@ -115,16 +124,22 @@ void main() {
         'Then start recording calls media manager with media projection true',
         () async {
       const isMediaProjection = true;
-      when(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).thenAnswer((_) async => {});
+      when(
+        () => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection,
+        ),
+      ).thenAnswer((_) async => {});
       when(() => configurationHolder.useMediaProjection)
           .thenReturn(isMediaProjection);
 
       await viewModel.act(StartVideoRecording());
 
       expect(viewModel.value.controlsState, ControlsState.recordingInProgress);
-      verify(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).called(1);
+      verify(
+        () => mediaManager.startVideoRecording(
+          isMediaProjection: isMediaProjection,
+        ),
+      ).called(1);
     });
 
     test(
@@ -132,22 +147,29 @@ void main() {
         'Then start recording calls media manager with media projection false',
         () async {
       const isMediaProjection = false;
-      when(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).thenAnswer((_) async => {});
+      when(
+        () => mediaManager.startVideoRecording(),
+      ).thenAnswer((_) async => {});
       when(() => configurationHolder.useMediaProjection)
           .thenReturn(isMediaProjection);
 
       await viewModel.act(StartVideoRecording());
 
       expect(viewModel.value.controlsState, ControlsState.recordingInProgress);
-      verify(() => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection)).called(1);
+      verify(
+        () => mediaManager.startVideoRecording(),
+      ).called(1);
     });
 
     test('stop recording adds video file', () async {
       const path = 'test/video.mp4';
-      when(() => mediaManager.stopVideoRecording())
-          .thenAnswer((_) async => path);
+      when(() => mediaManager.stopVideoRecording()).thenAnswer(
+        (_) async => ScreenVideoFile(
+          filePath: path,
+          startedAt: DateTime.timestamp(),
+          endedAt: DateTime.timestamp(),
+        ),
+      );
 
       await viewModel.act(StopVideoRecording());
       await pumpEvents();
@@ -177,9 +199,7 @@ void main() {
       );
       expect(uiEvents.last, isA<ErrorEvent>());
       verify(
-        () => mediaManager.startVideoRecording(
-          isMediaProjection: isMediaProjection,
-        ),
+        () => mediaManager.startVideoRecording(),
       ).called(1);
     });
   });
@@ -187,17 +207,19 @@ void main() {
   group('report sharing', () {
     test('share report calls usecase with all files', () async {
       final file = ScreenshotFile(
-        bytes: Uint8List(0),
-        index: 0,
-        createdAt: DateTime.now(),
+        filePath: 'path',
+        createdAt: DateTime.timestamp(),
       );
 
       final extraFiles = [
         LogsFile(
-            logs: [LogRecord(message: 'test log', timestamp: DateTime.now())]),
-        const AttributesFile(attrs: {
-          'test': {'key': 'value'}
-        }),
+          logs: [LogRecord(message: 'test log', timestamp: DateTime.now())],
+        ),
+        const AttributesFile(
+          attrs: {
+            'test': {'key': 'value'},
+          },
+        ),
       ];
 
       // Set initial state with title and severity
@@ -215,9 +237,11 @@ void main() {
         ),
       ).thenAnswer((_) => Future.value());
 
-      when(() => extraFilesRepository.getExtraFiles(
-            reportAttrs: any(named: 'reportAttrs'),
-          )).thenAnswer((_) async => extraFiles);
+      when(
+        () => extraFilesRepository.getExtraFiles(
+          reportAttrs: any(named: 'reportAttrs'),
+        ),
+      ).thenAnswer((_) async => extraFiles);
 
       await viewModel.act(ShareReport(asArchive: true));
       await pumpEvents();
@@ -232,9 +256,8 @@ void main() {
 
     test('share report file calls usecase with single file', () async {
       final file = ScreenshotFile(
-        bytes: Uint8List(0),
-        index: 0,
-        createdAt: DateTime.now(),
+        filePath: 'path',
+        createdAt: DateTime.timestamp(),
       );
       when(
         () => shareReportUsecase.call(
@@ -245,10 +268,12 @@ void main() {
 
       await viewModel.act(ShareReportFile(file: file));
 
-      verify(() => shareReportUsecase.call(
-            reportFiles: [file],
-            asArchive: false,
-          )).called(1);
+      verify(
+        () => shareReportUsecase.call(
+          reportFiles: [file],
+          asArchive: false,
+        ),
+      ).called(1);
     });
   });
 }

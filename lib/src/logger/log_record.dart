@@ -17,7 +17,7 @@ class LogRecord {
       "${timestamp.millisecond.toString().padLeft(3, '0')}";
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = {
+    final map = <String, dynamic>{
       'timestamp': timestamp.toIso8601String(),
       'message': message,
     };

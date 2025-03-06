@@ -3,6 +3,8 @@ import 'package:snaply/src/platform_interface/snaply_platform_interface.dart';
 
 /// An implementation of [SnaplyPlatformInterface] that uses method channels.
 class SnaplyPlatformImpl implements SnaplyPlatformInterface {
+  const SnaplyPlatformImpl(this.methodChannel);
+
   static const String _startScreenRecordingMethod =
       'startScreenRecordingMethod';
   static const String _stopScreenRecordingMethod = 'stopScreenRecordingMethod';
@@ -10,8 +12,6 @@ class SnaplyPlatformImpl implements SnaplyPlatformInterface {
   static const String _shareFilesMethod = 'shareFilesMethod';
   static const String _getSnaplyDirectoryMethod = 'getSnaplyDirectoryMethod';
   static const String _getDeviceInfoMethod = 'getDeviceInfoMethod';
-
-  const SnaplyPlatformImpl(this.methodChannel);
 
   final MethodChannel methodChannel;
 
@@ -78,8 +78,8 @@ class SnaplyPlatformImpl implements SnaplyPlatformInterface {
   @override
   Future<Map<String, Map<String, String>>> getDeviceInfo() async {
     try {
-      final Map? result =
-          await methodChannel.invokeMethod<Map?>(_getDeviceInfoMethod);
+      final result = await methodChannel
+          .invokeMethod<Map<dynamic, dynamic>?>(_getDeviceInfoMethod);
 
       if (result == null) {
         throw Exception('$_getDeviceInfoMethod returned null');

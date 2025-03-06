@@ -29,12 +29,18 @@ class _ReportFilesFullViewLayoutState extends State<ReportFilesFullViewLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages =
-        widget.files.map((f) => _fileFullView(f)).toList();
+    final List<Widget> pages = widget.files
+        .map(
+          (f) => Padding(
+            padding: const EdgeInsets.all(4),
+            child: _fileFullView(f),
+          ),
+        )
+        .toList();
 
     if (widget.files.isEmpty) {
       return const Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8),
         child: Center(
           child: Text('No media files attached'),
         ),
@@ -67,7 +73,7 @@ class _ReportFilesFullViewLayoutState extends State<ReportFilesFullViewLayout> {
       case ScreenVideoFile():
         return FullViewVideo(file: File(file.filePath));
       case ScreenshotFile():
-        return FullViewScreenshot(bytes: file.bytes);
+        return FullViewScreenshot(file: File(file.filePath));
       case LogsFile():
         return FullViewLogs(logsFile: file);
       case AttributesFile():

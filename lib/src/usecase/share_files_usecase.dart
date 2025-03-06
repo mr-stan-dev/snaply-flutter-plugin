@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:snaply/src/archive/archive_creator.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/mappers/file_to_archive_entry_mapper.dart';
@@ -27,18 +25,17 @@ class ShareFilesUsecase {
   }) async {
     final snaplyDirPath = await _platformInterface.getSnaplyDirectory();
 
-    final List<String> filesPaths = [];
+    final filesPaths = <String>[];
 
     if (asArchive) {
-      final archiveEntries =
-          reportFiles.map((f) => _archiveEntryMapper.map(f)).toList();
+      final archiveEntries = reportFiles.map(_archiveEntryMapper.map).toList();
       final archivePath = await _archiveCreator.create(
         dirPath: snaplyDirPath,
         entries: archiveEntries,
       );
       filesPaths.add(archivePath);
     } else {
-      final List<File> reportFilesPaths = await Future.wait(
+      final reportFilesPaths = await Future.wait(
         reportFiles.map(
           (f) => _fileToPathMapper.map(appDirPath: snaplyDirPath, file: f),
         ),
