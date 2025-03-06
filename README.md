@@ -29,7 +29,7 @@ Designed for developers and QA engineers to enhance debugging and testing proces
 
 ```yaml  
 dependencies:
-  snaply: ^0.0.1-alpha.3  
+  snaply: ^0.0.1-alpha.4  
 ```  
 
 2. Wrap your App with SnaplyApp:
@@ -54,7 +54,7 @@ void main() {
 The report button is visible by default. To show or hide it, use:
 
 ```dart  
-SnaplyReporter.instance.setVisibility(false);
+SnaplyReporter.instance.setVisibility(isVisible: false);
 ```  
 
 ### Add Custom Attributes
