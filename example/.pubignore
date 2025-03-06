@@ -1,0 +1,9 @@
+ **/CMakeFiles/
+ **/.cxx/
+ **/cmake-build-*/
+ **/CMakeCache.txt
+ **/cmake_install.cmake
+ build/
+ .dart_tool/
+ .idea/
+ .vscode/
