@@ -25,7 +25,9 @@ class ControlButtons extends StatelessWidget {
         visible: state.controlsState != ControlsState.invisible,
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.onSurface.withValues(
+                  alpha: 0.3,
+                ),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
