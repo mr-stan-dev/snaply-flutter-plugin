@@ -1,0 +1,18 @@
+name: snaply
+
+packages:
+  - "."
+  - "example"
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  pre-push:
+    description: "Run all checks before push"
+    run: "dart format --set-exit-if-changed . && flutter analyze && flutter test"
+
+  tag:
+    description: "Create and push version tag"
+    run: 'git tag v$(grep "version: " pubspec.yaml | cut -d " " -f 2) && git push --tags'

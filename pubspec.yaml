@@ -19,14 +19,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  husky: ^0.1.7
+  melos: ^3.1.1
   mocktail: ^1.0.4
   very_good_analysis: ^5.1.0
-
-scripts:
-  prepare: husky install
-  pre-push: "dart format --set-exit-if-changed . && flutter analyze && flutter test"
-  tag: "git tag v$(grep 'version: ' pubspec.yaml | cut -d ' ' -f 2) && git push --tags"
 
 flutter:
   plugin:
