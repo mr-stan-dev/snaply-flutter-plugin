@@ -3,6 +3,7 @@ import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/mappers/file_to_archive_entry_mapper.dart';
 import 'package:snaply/src/mappers/file_to_path_mapper.dart';
 import 'package:snaply/src/platform_interface/snaply_platform_interface.dart';
+import 'package:snaply/src/utils/list_utils.dart';
 
 class ShareFilesUsecase {
   const ShareFilesUsecase({
@@ -25,23 +26,39 @@ class ShareFilesUsecase {
   }) async {
     final snaplyDirPath = await _platformInterface.getSnaplyDirectory();
 
-    final filesPaths = <String>[];
-
-    if (asArchive) {
-      final archiveEntries = reportFiles.map(_archiveEntryMapper.map).toList();
-      final archivePath = await _archiveCreator.create(
-        dirPath: snaplyDirPath,
-        entries: archiveEntries,
-      );
-      filesPaths.add(archivePath);
-    } else {
-      final reportFilesPaths = await Future.wait(
-        reportFiles.map(
-          (f) => _fileToPathMapper.map(appDirPath: snaplyDirPath, file: f),
-        ),
-      );
-      filesPaths.addAll(reportFilesPaths.map((f) => f.path));
-    }
+    final filesPaths = asArchive
+        ? await _getArchivePath(
+            reportFiles: reportFiles,
+            snaplyDirPath: snaplyDirPath,
+          )
+        : await _getIndividualFilesPaths(
+            reportFiles: reportFiles,
+            snaplyDirPath: snaplyDirPath,
+          );
     await _platformInterface.shareFiles(filesPaths);
+  }
+
+  Future<List<String>> _getArchivePath({
+    required List<ReportFile> reportFiles,
+    required String snaplyDirPath,
+  }) async {
+    final archiveEntries = reportFiles.map(_archiveEntryMapper.map).toList();
+    final archivePath = await _archiveCreator.create(
+      dirPath: snaplyDirPath,
+      entries: archiveEntries.whereNotNull(),
+    );
+    return [archivePath];
+  }
+
+  Future<List<String>> _getIndividualFilesPaths({
+    required List<ReportFile> reportFiles,
+    required String snaplyDirPath,
+  }) async {
+    final paths = await Future.wait(
+      reportFiles.map(
+        (f) => _fileToPathMapper.map(appDirPath: snaplyDirPath, file: f),
+      ),
+    );
+    return paths.whereNotNull();
   }
 }

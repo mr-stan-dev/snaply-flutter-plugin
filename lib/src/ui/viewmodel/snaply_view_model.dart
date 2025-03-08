@@ -227,7 +227,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       );
       value = value.copyWith(extraFiles: files);
     } catch (e, s) {
-      _showError(e, s, errorMsg: 'Build attributes error');
+      _showError(e, s, errorMsg: 'Extra files error');
     }
   }
 

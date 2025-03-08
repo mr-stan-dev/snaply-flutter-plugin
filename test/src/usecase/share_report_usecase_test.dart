@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:snaply/src/archive/archive_creator.dart';
@@ -92,9 +90,9 @@ void main() {
       () async {
     // Mock file path mapping for both files
     when(() => fileToPathMapper.map(appDirPath: tempDir, file: videoFile))
-        .thenAnswer((_) async => File(videoPath));
+        .thenAnswer((_) async => videoPath);
     when(() => fileToPathMapper.map(appDirPath: tempDir, file: screenshotFile))
-        .thenAnswer((_) async => File(screenshotPath));
+        .thenAnswer((_) async => screenshotPath);
 
     await usecase.call(
       reportFiles: [videoFile, screenshotFile],
