@@ -1,2 +1,2 @@
 #!/bin/sh
-melos run pre-push
+/Users/mrstan/.pub-cache/bin/melos run pre-push
