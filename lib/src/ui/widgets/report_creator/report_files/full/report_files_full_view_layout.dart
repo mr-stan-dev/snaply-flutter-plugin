@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_files/full/full_view_attributes.dart';
+import 'package:snaply/src/ui/widgets/report_creator/report_files/full/full_view_custom_file.dart'
+    show FullViewCustomFile;
 import 'package:snaply/src/ui/widgets/report_creator/report_files/full/full_view_logs.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_files/full/full_view_screenshot.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_files/full/full_view_video.dart';
@@ -78,6 +80,8 @@ class _ReportFilesFullViewLayoutState extends State<ReportFilesFullViewLayout> {
         return FullViewLogs(logsFile: file);
       case AttributesFile():
         return FullViewAttributes(attrsFile: file);
+      case CustomFile():
+        return FullViewCustomFile(file: file);
     }
   }
 

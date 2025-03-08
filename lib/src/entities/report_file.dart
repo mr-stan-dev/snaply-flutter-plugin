@@ -1,3 +1,5 @@
+import 'package:snaply/src/data_holders/custom_files_holder.dart'
+    show CustomFilesHolder;
 import 'package:snaply/src/logger/log_record.dart';
 
 abstract interface class MediaFile {
@@ -66,4 +68,23 @@ class AttributesFile extends ReportFile {
   String get fileName => 'snaply_attributes.txt';
 
   final Map<String, Map<String, String>> attrs;
+}
+
+class CustomFile extends ReportFile {
+  const CustomFile({
+    required this.filePath,
+    required this.exists,
+    required this.length,
+  });
+
+  final String filePath;
+  final bool exists;
+  final int length;
+
+  bool get isValidSize => length <= CustomFilesHolder.maxFilesSize;
+
+  bool get isValid => exists && isValidSize;
+
+  @override
+  String get fileName => Uri.file(filePath).pathSegments.last;
 }

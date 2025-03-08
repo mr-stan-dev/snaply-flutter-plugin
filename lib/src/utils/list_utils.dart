@@ -15,4 +15,14 @@ extension ListX<T> on List<T> {
       (index) => convert(index, this[index]),
     );
   }
+
+  /// Filters out null values from the list.
+  ///
+  /// Example:
+  /// ```dart
+  /// final list = ['a', null, 'b', null, 'c'];
+  /// final result = list.whereNotNull();
+  /// print(result); // ['a', 'b', 'c']
+  /// ```
+  List<T2> whereNotNull<T2>() => where((e) => e != null).cast<T2>().toList();
 }
