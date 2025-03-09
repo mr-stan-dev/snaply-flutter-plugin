@@ -52,7 +52,7 @@ class _ReportCreatorTitleState extends State<ReportCreatorTitle> {
             border: const OutlineInputBorder(),
             hintText: 'Enter report title',
             hintStyle: titleStyle?.copyWith(
-              color: titleStyle.color?.withValues(alpha: 0.5),
+              color: titleStyle.color?.withOpacity(0.5),
             ),
             counterText: '',
           ),
