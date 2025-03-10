@@ -1,6 +1,7 @@
 import 'package:snaply/src/archive/archive_creator.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
+import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/mappers/file_to_archive_entry_mapper.dart';
 import 'package:snaply/src/mappers/file_to_path_mapper.dart';
@@ -26,6 +27,7 @@ class SnaplyViewModelCreator {
         platform: platformInterface,
         logger: SnaplyLogger.instance,
         customAttributesHolder: CustomAttributesHolder.instance,
+        customFilesHolder: CustomFilesHolder.instance,
       ),
       configurationHolder: ConfigurationHolder.instance,
     );

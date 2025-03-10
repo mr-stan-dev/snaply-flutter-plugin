@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:snaply/snaply.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
+import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
 
@@ -15,11 +16,14 @@ class MockConfigurationHolder extends Mock implements ConfigurationHolder {
 class MockCustomAttributesHolder extends Mock
     implements CustomAttributesHolder {}
 
+class MockCustomFilesHolder extends Mock implements CustomFilesHolder {}
+
 class MockSnaplyLogger extends Mock implements SnaplyLogger {}
 
 void main() {
   late MockConfigurationHolder configHolder;
   late MockCustomAttributesHolder attributesHolder;
+  late MockCustomFilesHolder customFilesHolder;
   late MockSnaplyLogger logger;
   late SnaplyReporter reporter;
   late VisibilityNotifier visibilityNotifier;
@@ -32,6 +36,7 @@ void main() {
   setUp(() {
     configHolder = MockConfigurationHolder();
     attributesHolder = MockCustomAttributesHolder();
+    customFilesHolder = MockCustomFilesHolder();
     logger = MockSnaplyLogger();
     visibilityNotifier = VisibilityNotifier();
 
@@ -44,6 +49,7 @@ void main() {
     reporter = SnaplyReporterImpl(
       configHolder: configHolder,
       attributesHolder: attributesHolder,
+      customFilesHolder: customFilesHolder,
       logger: logger,
     );
   });

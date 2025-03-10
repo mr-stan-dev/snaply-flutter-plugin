@@ -4,21 +4,33 @@ import 'dart:io';
 import 'package:snaply/src/entities/report_file.dart';
 
 class FileToPathMapper {
-  Future<File> map({
+  Future<String?> map({
     required String appDirPath,
     required ReportFile file,
   }) async {
     switch (file) {
       case ScreenVideoFile():
-        return File(file.filePath);
+        return file.filePath;
       case ScreenshotFile():
-        return File(file.filePath);
+        return file.filePath;
       case LogsFile():
         final tempFile = File('$appDirPath/${file.fileName}');
-        return tempFile.writeAsBytes(_toBytes(file.logs));
+        await tempFile.writeAsBytes(_toBytes(file.logs));
+        return tempFile.path;
       case AttributesFile():
         final tempFile = File('$appDirPath/${file.fileName}');
-        return tempFile.writeAsBytes(_toBytes(file.attrs));
+        await tempFile.writeAsBytes(_toBytes(file.attrs));
+        return tempFile.path;
+      case CustomFile():
+        if (file.isValid) {
+          // Need to copy into snaply dir to be able to share a file
+          final originalFile = File(file.filePath);
+          final snaplyDirCopyPath = '$appDirPath/${file.fileName}';
+          await originalFile.copy(snaplyDirCopyPath);
+          return snaplyDirCopyPath;
+        } else {
+          return null;
+        }
     }
   }
 

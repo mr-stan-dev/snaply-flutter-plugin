@@ -4,7 +4,7 @@ import 'package:snaply/src/archive/archive_entry.dart';
 import 'package:snaply/src/entities/report_file.dart';
 
 class FileToArchiveEntryMapper {
-  ArchiveEntry map(ReportFile file) {
+  ArchiveEntry? map(ReportFile file) {
     switch (file) {
       case ScreenVideoFile():
         return ArchiveEntry.fromPath(filePath: file.filePath);
@@ -20,6 +20,10 @@ class FileToArchiveEntryMapper {
           fileName: file.fileName,
           fileBytes: _toBytes(file.attrs),
         );
+      case CustomFile():
+        return file.isValid
+            ? ArchiveEntry.fromPath(filePath: file.filePath)
+            : null;
     }
   }
 

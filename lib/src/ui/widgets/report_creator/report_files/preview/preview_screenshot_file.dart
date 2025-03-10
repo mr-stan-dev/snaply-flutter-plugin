@@ -22,7 +22,7 @@ class PreviewScreenshotFile extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        Container(color: Colors.black.withValues(alpha: 0.3)),
+        Container(color: Colors.black54),
         Positioned(
           top: 4,
           right: 4,

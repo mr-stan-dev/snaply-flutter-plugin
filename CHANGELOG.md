@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.1-alpha.5 (2025-03-10)
+
+### Changes
+
+- Return to flutter sdk 3.24.0 (#28)
+- Implement adding custom files to report (#26)
+- Implement melos for scripts and remove husky (#27)
+- Add CMakeFiles to pubignore and gitignore (#25)
+
 ## 0.0.1-alpha.4
 
 ### Features

@@ -31,7 +31,7 @@ void main() {
 
       final result = await mapper.map(appDirPath: tempDir, file: file);
 
-      expect(result.path, equals('test/video.mp4'));
+      expect(result, equals('test/video.mp4'));
     });
 
     test('maps ScreenshotFile to new file with bytes', () async {
@@ -44,7 +44,7 @@ void main() {
 
       final result = await mapper.map(appDirPath: tempDir, file: file);
 
-      expect(result.path, equals(filePath));
+      expect(result, equals(filePath));
     });
 
     test('maps AttributesFile to new file with encoded content', () async {
@@ -54,11 +54,12 @@ void main() {
       };
       final file = AttributesFile(attrs: attrs);
 
-      final result = await mapper.map(appDirPath: tempDir, file: file);
+      final filePath = await mapper.map(appDirPath: tempDir, file: file);
+      final ioFile = File(filePath!);
 
-      expect(result.path, equals('$tempDir/snaply_attributes.txt'));
-      expect(result.existsSync(), isTrue);
-      final content = await result.readAsString();
+      expect(filePath, equals('$tempDir/snaply_attributes.txt'));
+      expect(ioFile.existsSync(), isTrue);
+      final content = await ioFile.readAsString();
       expect(content, contains('device'));
       expect(content, contains('model'));
       expect(content, contains('Test Device'));
@@ -77,13 +78,55 @@ void main() {
       ];
       final file = LogsFile(logs: logs);
 
-      final result = await mapper.map(appDirPath: tempDir, file: file);
+      final filePath = await mapper.map(appDirPath: tempDir, file: file);
+      final ioFile = File(filePath!);
 
-      expect(result.path, equals('$tempDir/snaply_logs.txt'));
-      expect(result.existsSync(), isTrue);
-      final content = await result.readAsString();
+      expect(ioFile.path, equals('$tempDir/snaply_logs.txt'));
+      expect(ioFile.existsSync(), isTrue);
+      final content = await ioFile.readAsString();
       expect(content, contains('log1'));
       expect(content, contains('log2'));
+    });
+
+    test('maps existing CustomFile to its path', () async {
+      final customFilePath = '$tempDir/custom_file.txt';
+      await File(customFilePath).writeAsString('test content');
+
+      final file = CustomFile(
+        filePath: customFilePath,
+        exists: true,
+        length: 100,
+      );
+
+      final result = await mapper.map(appDirPath: tempDir, file: file);
+
+      expect(result, equals(customFilePath));
+      expect(File(result!).existsSync(), isTrue);
+    });
+
+    test('maps non-existent CustomFile to null', () async {
+      final file = CustomFile(
+        filePath: '$tempDir/non_existent.txt',
+        exists: false,
+        length: 0,
+      );
+
+      final result = await mapper.map(appDirPath: tempDir, file: file);
+
+      expect(result, isNull);
+    });
+
+    test('maps CustomFile larger than 10MB to null', () async {
+      const maxFileSize = 5 * 1024 * 1024; // 5MB
+      final file = CustomFile(
+        filePath: '$tempDir/large_file.txt',
+        exists: true,
+        length: maxFileSize + 1, // Exceeds max size by 1 byte
+      );
+
+      final result = await mapper.map(appDirPath: tempDir, file: file);
+
+      expect(result, isNull);
     });
   });
 }

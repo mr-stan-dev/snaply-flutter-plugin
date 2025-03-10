@@ -29,7 +29,7 @@ Designed for developers and QA engineers to enhance debugging and testing proces
 
 ```yaml  
 dependencies:
-  snaply: ^0.0.1-alpha.4  
+  snaply: ^0.0.1-alpha.5  
 ```  
 
 2. Wrap your App with SnaplyApp:

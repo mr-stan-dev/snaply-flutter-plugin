@@ -91,3 +91,10 @@ example/.pub/
 # Temporary files
 *.bak
 *.tmp
+
+# CMake and native build files
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/.cxx/
+**/cmake-build-*/

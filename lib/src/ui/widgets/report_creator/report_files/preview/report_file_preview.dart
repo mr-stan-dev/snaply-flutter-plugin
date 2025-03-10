@@ -60,19 +60,30 @@ class ReportFilePreview extends StatelessWidget {
         return _extraFilePreview(fileName: 'Logs');
       case AttributesFile():
         return _extraFilePreview(fileName: 'Attributes');
+      case final CustomFile f:
+        return f.isValid
+            ? _extraFilePreview(fileName: 'Custom file')
+            : _extraFilePreview(
+                fileName: 'Custom file (invalid)',
+                iconData: Icons.warning,
+                iconColor: Colors.orangeAccent,
+              );
     }
   }
 
   Widget _extraFilePreview({
     required String fileName,
+    IconData iconData = Icons.text_snippet_rounded,
+    Color? iconColor,
   }) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.text_snippet_rounded,
+          Icon(
+            iconData,
+            color: iconColor,
             size: 32,
           ),
           const SizedBox(height: 8),
