@@ -16,3 +16,16 @@ scripts:
   tag:
     description: "Create and push version tag"
     run: 'git tag v$(grep "version: " pubspec.yaml | cut -d " " -f 2) && git push --tags'
+
+  changelog:
+    description: "Generate changelog since last tag"
+    run: |
+      LAST_TAG=$(git describe --tags --abbrev=0)
+      VERSION=$(grep 'version: ' pubspec.yaml | cut -d ' ' -f 2)
+      echo "## $VERSION ($(date '+%Y-%m-%d'))\n" > .changelog.new
+      echo "### Changes\n" >> .changelog.new
+      git log $LAST_TAG..HEAD --pretty=format:"- %s" >> .changelog.new
+      echo "\n" >> .changelog.new
+      awk '/# Changelog/{p=$0;getline;print p;print;system("cat .changelog.new");next}1' CHANGELOG.md > CHANGELOG.md.new
+      mv CHANGELOG.md.new CHANGELOG.md
+      rm .changelog.new
