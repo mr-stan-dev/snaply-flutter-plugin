@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
@@ -13,17 +14,20 @@ class SnaplyReporterImpl implements SnaplyReporter {
     required CustomAttributesHolder attributesHolder,
     required CustomFilesHolder customFilesHolder,
     required SnaplyLogger logger,
+    required CallbacksHolder callbacksHolder,
   })  : _initializer = initializer,
         _configHolder = configHolder,
         _attributesHolder = attributesHolder,
         _customFilesHolder = customFilesHolder,
-        _logger = logger;
+        _logger = logger,
+        _callbacksHolder = callbacksHolder;
 
   final SnaplyInitializer _initializer;
   final ConfigurationHolder _configHolder;
   final CustomAttributesHolder _attributesHolder;
   final CustomFilesHolder _customFilesHolder;
   final SnaplyLogger _logger;
+  final CallbacksHolder _callbacksHolder;
 
   @override
   void setVisibility({
@@ -61,5 +65,12 @@ class SnaplyReporterImpl implements SnaplyReporter {
     if (_initializer.isInitialized) {
       function();
     }
+  }
+
+  @override
+  void setCallbacks({
+    required Future<void> Function() onReportReview,
+  }) {
+    _callbacksHolder.onReportReview = onReportReview;
   }
 }

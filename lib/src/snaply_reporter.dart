@@ -1,3 +1,4 @@
+import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
@@ -17,6 +18,7 @@ abstract interface class SnaplyReporter {
     attributesHolder: CustomAttributesHolder.instance,
     customFilesHolder: CustomFilesHolder.instance,
     logger: SnaplyLogger.instance,
+    callbacksHolder: CallbacksHolder.instance,
   );
 
   /// Controls report activation button visibility.
@@ -49,4 +51,8 @@ abstract interface class SnaplyReporter {
   ///
   /// If [filesPaths] is null it clears all custom files
   void setCustomFiles({required Map<String, String>? filesPaths});
+
+  void setCallbacks({
+    required Future<void> Function() onReportReview,
+  });
 }
