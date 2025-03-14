@@ -73,9 +73,15 @@ void main() {
     test('setAttributes updates attributes when initialized', () async {
       when(() => initializer.isInitialized).thenReturn(true);
 
-      final attributes = {'key': 'value'};
-      reporter.setAttributes(attributes);
-      verify(() => attributesHolder.addAttributes(attributes)).called(1);
+      const attrKey = 'testKey';
+      final attrMap = {'key': 'value'};
+      reporter.setAttributes(attrKey: attrKey, attrMap: attrMap);
+      verify(
+        () => attributesHolder.addAttributes(
+          attrKey: attrKey,
+          attrMap: attrMap,
+        ),
+      ).called(1);
     });
 
     test('log adds message when initialized', () {
@@ -99,32 +105,47 @@ void main() {
     test('setAttributes does nothing when reporter is not initialized',
         () async {
       when(() => initializer.isInitialized).thenReturn(false);
-      final attributes = {'key': 'value'};
+      const attrKey = 'testKey';
+      final attrMap = {'key': 'value'};
 
-      reporter.setAttributes(attributes);
-      verifyNever(() => attributesHolder.addAttributes(any()));
+      reporter.setAttributes(attrKey: attrKey, attrMap: attrMap);
+      verifyNever(
+        () => attributesHolder.addAttributes(
+          attrKey: any(named: 'attrKey'),
+          attrMap: any(named: 'attrMap'),
+        ),
+      );
     });
 
-    test('log does nothing when reporter is not initialized', () {
-      when(() => initializer.isInitialized).thenReturn(false);
-      when(() => logger.addLog(message: any(named: 'message')))
-          .thenAnswer((_) => {});
-      const message = 'test message';
-      reporter.log(message: message);
-      verifyNever(() => logger.addLog(message: message));
-    });
+    test(
+      'log does nothing when reporter is not initialized',
+      () {
+        when(() => initializer.isInitialized).thenReturn(false);
+        when(() => logger.addLog(message: any(named: 'message')))
+            .thenAnswer((_) => {});
+        const message = 'test message';
+        reporter.log(message: message);
+        verifyNever(() => logger.addLog(message: message));
+      },
+    );
 
     test('setAttributes handles different attribute types', () {
       when(() => initializer.isInitialized).thenReturn(true);
 
-      final attributes = {
+      const attrKey = 'testKey';
+      final attrMap = {
         'string': 'value',
         'number': '42',
         'boolean': 'true',
       };
 
-      reporter.setAttributes(attributes);
-      verify(() => attributesHolder.addAttributes(attributes)).called(1);
+      reporter.setAttributes(attrKey: attrKey, attrMap: attrMap);
+      verify(
+        () => attributesHolder.addAttributes(
+          attrKey: attrKey,
+          attrMap: attrMap,
+        ),
+      ).called(1);
     });
 
     test('log handles different message types', () {
@@ -198,6 +219,52 @@ void main() {
       // Also verify that setting null doesn't work when not initialized
       reporter.setCallbacks();
       verifyNever(() => callbacksHolder.onReportReview = null);
+    });
+
+    test('addCustomFile adds file when initialized', () async {
+      when(() => initializer.isInitialized).thenReturn(true);
+
+      const key = 'testFile';
+      const path = '/path/to/file.txt';
+      reporter.addCustomFile(key: key, path: path);
+      verify(
+        () => customFilesHolder.addCustomFile(
+          key: key,
+          path: path,
+        ),
+      ).called(1);
+    });
+
+    test('addCustomFile does nothing when reporter is not initialized',
+        () async {
+      when(() => initializer.isInitialized).thenReturn(false);
+      const key = 'testFile';
+      const path = '/path/to/file.txt';
+
+      reporter.addCustomFile(key: key, path: path);
+      verifyNever(
+        () => customFilesHolder.addCustomFile(
+          key: any(named: 'key'),
+          path: any(named: 'path'),
+        ),
+      );
+    });
+
+    test('addCustomFile can be called multiple times with same key', () async {
+      when(() => initializer.isInitialized).thenReturn(true);
+
+      const key = 'testFile';
+      const path1 = '/path/to/file1.txt';
+      const path2 = '/path/to/file2.txt';
+
+      reporter
+        ..addCustomFile(key: key, path: path1)
+        ..addCustomFile(key: key, path: path2);
+
+      verifyInOrder([
+        () => customFilesHolder.addCustomFile(key: key, path: path1),
+        () => customFilesHolder.addCustomFile(key: key, path: path2),
+      ]);
     });
   });
 }

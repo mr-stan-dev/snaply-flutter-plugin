@@ -5,7 +5,8 @@ void main() {
   late CustomFilesHolder holder;
 
   setUp(() {
-    holder = CustomFilesHolder.instance..clear();
+    holder = CustomFilesHolder.instance;
+    holder.customFiles.clear();
   });
 
   group('CustomFilesHolder', () {
@@ -23,13 +24,15 @@ void main() {
       });
     });
 
-    group('setCustomFiles', () {
+    group('addCustomFile', () {
       test('adds files up to max limit', () {
-        final files = Map.fromEntries(
-          List.generate(6, (i) => MapEntry('file${i + 1}', 'path${i + 1}')),
-        );
-
-        holder.setCustomFiles(files);
+        // Add 6 files, only first 5 should be added
+        for (var i = 0; i < 6; i++) {
+          holder.addCustomFile(
+            key: 'file${i + 1}',
+            path: 'path${i + 1}',
+          );
+        }
 
         expect(holder.customFiles.length, equals(CustomFilesHolder.maxFiles));
         expect(holder.customFiles.containsKey('file6'), isFalse);
@@ -39,14 +42,10 @@ void main() {
 
       test('preserves existing files when adding new ones', () {
         holder
-          ..setCustomFiles({
-            'file1': 'path1',
-            'file2': 'path2',
-          })
-          ..setCustomFiles({
-            'file3': 'path3',
-            'file4': 'path4',
-          });
+          ..addCustomFile(key: 'file1', path: 'path1')
+          ..addCustomFile(key: 'file2', path: 'path2')
+          ..addCustomFile(key: 'file3', path: 'path3')
+          ..addCustomFile(key: 'file4', path: 'path4');
 
         expect(holder.customFiles.length, equals(4));
         expect(
@@ -62,13 +61,15 @@ void main() {
 
       test('updates existing file when at max limit', () {
         // Fill up to max
-        holder
-          ..setCustomFiles(
-            Map.fromEntries(
-              List.generate(5, (i) => MapEntry('file${i + 1}', 'path${i + 1}')),
-            ),
-          )
-          ..setCustomFiles({'file3': 'new_path3'});
+        for (var i = 0; i < 5; i++) {
+          holder.addCustomFile(
+            key: 'file${i + 1}',
+            path: 'path${i + 1}',
+          );
+        }
+
+        // Update an existing file
+        holder.addCustomFile(key: 'file3', path: 'new_path3');
 
         expect(holder.customFiles.length, equals(CustomFilesHolder.maxFiles));
         expect(holder.customFiles['file3'], equals('new_path3'));
@@ -80,44 +81,28 @@ void main() {
 
       test('ignores new files when at max limit', () {
         // Fill up to max
-        holder
-          ..setCustomFiles(
-            Map.fromEntries(
-              List.generate(5, (i) => MapEntry('file${i + 1}', 'path${i + 1}')),
-            ),
-          )
-          ..setCustomFiles({'file6': 'path6'});
+        for (var i = 0; i < 5; i++) {
+          holder.addCustomFile(
+            key: 'file${i + 1}',
+            path: 'path${i + 1}',
+          );
+        }
+
+        // Try to add a new file
+        holder.addCustomFile(key: 'file6', path: 'path6');
 
         expect(holder.customFiles.length, equals(CustomFilesHolder.maxFiles));
         expect(holder.customFiles.containsKey('file6'), isFalse);
-      });
-
-      test('preserves files when setting empty map', () {
-        holder
-          ..setCustomFiles({
-            'file1': 'path1',
-            'file2': 'path2',
-          })
-          ..setCustomFiles({});
-
-        expect(
-          holder.customFiles,
-          equals({
-            'file1': 'path1',
-            'file2': 'path2',
-          }),
-        );
       });
     });
 
     group('clear', () {
       test('removes all files', () {
         holder
-          ..setCustomFiles({
-            'file1': 'path1',
-            'file2': 'path2',
-          })
-          ..clear();
+          ..addCustomFile(key: 'file1', path: 'path1')
+          ..addCustomFile(key: 'file2', path: 'path2');
+
+        holder.customFiles.clear();
 
         expect(holder.customFiles, isEmpty);
       });

@@ -37,9 +37,15 @@ class SnaplyReporterImpl implements SnaplyReporter {
   }
 
   @override
-  void setAttributes(Map<String, String> attributes) {
+  void setAttributes({
+    required String attrKey,
+    required Map<String, String> attrMap,
+  }) {
     _runIfInitialized(
-      () => _attributesHolder.addAttributes(attributes),
+      () => _attributesHolder.addAttributes(
+        attrKey: attrKey,
+        attrMap: attrMap,
+      ),
     );
   }
 
@@ -51,13 +57,12 @@ class SnaplyReporterImpl implements SnaplyReporter {
   }
 
   @override
-  void setCustomFiles({
-    required Map<String, String>? filesPaths,
+  void addCustomFile({
+    required String key,
+    required String path,
   }) {
     _runIfInitialized(
-      () => filesPaths == null
-          ? _customFilesHolder.clear()
-          : _customFilesHolder.setCustomFiles(filesPaths),
+      () => _customFilesHolder.addCustomFile(key: key, path: path),
     );
   }
 

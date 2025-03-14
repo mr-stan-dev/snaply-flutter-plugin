@@ -16,9 +16,12 @@ class _ExampleAppState extends State<ExampleApp> {
     setState(() {
       _isDarkMode = !_isDarkMode;
     });
-    SnaplyReporter.instance.setAttributes({
-      'is_dark': _isDarkMode.toString(),
-    });
+    SnaplyReporter.instance.setAttributes(
+      attrKey: 'theme_config',
+      attrMap: {
+        'is_dark': _isDarkMode.toString(),
+      },
+    );
   }
 
   @override
