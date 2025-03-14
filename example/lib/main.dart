@@ -7,7 +7,6 @@ void main() {
   // Enable Snaply based on your build configuration
   const isSnaplyEnabled = true;
   if (isSnaplyEnabled) {
-    SnaplyReporter.instance.init();
     runApp(const SnaplyApp(child: exampleApp));
   } else {
     runApp(exampleApp);
