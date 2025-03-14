@@ -50,9 +50,41 @@ abstract interface class SnaplyReporter {
   /// * Value: Absolute path to the file on the device
   ///
   /// If [filesPaths] is null it clears all custom files
-  void setCustomFiles({required Map<String, String>? filesPaths});
+  void setCustomFiles({
+    required Map<String, String>? filesPaths,
+  });
 
+  /// Sets callback functions to be invoked during the bug reporting process.
+  ///
+  /// Use this method to configure custom behavior that should be executed at
+  /// specific points during the bug reporting flow.
+  ///
+  /// Parameters:
+  /// * [onReportReview]: An optional callback function that is invoked when the
+  /// user starts reviewing their bug report. This is useful for setting custom
+  /// attributes and files just before report review screen is visible.
+  /// The callback is async function so you can perform any long-run
+  /// operations to get and set all the required data.
+  /// If null is provided, any previously set callback will be removed.
+  ///
+  /// Example:
+  /// ```dart
+  /// reporter.setCallbacks(
+  ///   onReportReview: () async {
+  ///     SnaplyReporter.setAttributes(...)
+  ///     SnaplyReporter.setCustomFiles(...)
+  ///   },
+  /// );
+  ///
+  /// // Remove the callback
+  /// reporter.setCallbacks(
+  ///   onReportReview: null,
+  /// );
+  /// ```
+  ///
+  /// Note: The callback will only be executed if the reporter is initialized.
+  /// Multiple calls to this method will override previously set callbacks.
   void setCallbacks({
-    required Future<void> Function() onReportReview,
+    Future<void> Function()? onReportReview,
   });
 }

@@ -61,16 +61,22 @@ class SnaplyReporterImpl implements SnaplyReporter {
     );
   }
 
+  @override
+  void setCallbacks({
+    Future<void> Function()? onReportReview,
+  }) {
+    _runIfInitialized(
+      () {
+        if (onReportReview != null) {
+          _callbacksHolder.onReportReview = onReportReview;
+        }
+      },
+    );
+  }
+
   void _runIfInitialized(VoidCallback function) {
     if (_initializer.isInitialized) {
       function();
     }
-  }
-
-  @override
-  void setCallbacks({
-    required Future<void> Function() onReportReview,
-  }) {
-    _callbacksHolder.onReportReview = onReportReview;
   }
 }

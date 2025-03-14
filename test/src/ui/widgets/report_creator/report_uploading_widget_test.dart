@@ -21,7 +21,7 @@ void main() {
       await pumpUploadingWidget(tester);
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.text('Uploading report'), findsOneWidget);
+      expect(find.text('Preparing report data'), findsOneWidget);
     });
 
     testWidgets('centers content vertically', (tester) async {
