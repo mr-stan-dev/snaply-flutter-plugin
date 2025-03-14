@@ -41,20 +41,16 @@ abstract interface class SnaplyReporter {
   /// Messages are automatically timestamped when added.
   void log({required String message});
 
-  /// Sets custom files to be included in the bug report. Max 5 files.
+  /// Add custom file to be included in the bug report. Max 5 files.
   ///
   /// Each file must be:
   /// * Less than 5MB in size
   /// * Accessible with read permissions
   /// * Currently existing on the device
   ///
-  /// [filesPaths] is a map where:
-  /// * Key: A descriptive name for the file
-  /// * Value: Absolute path to the file on the device
-  ///
-  /// If [filesPaths] is null it clears all custom files
-  void setCustomFiles({
-    required Map<String, String>? filesPaths,
+  void addCustomFile({
+    required String key,
+    required String path,
   });
 
   /// Sets callback functions to be invoked during the bug reporting process.

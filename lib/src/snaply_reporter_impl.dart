@@ -57,13 +57,12 @@ class SnaplyReporterImpl implements SnaplyReporter {
   }
 
   @override
-  void setCustomFiles({
-    required Map<String, String>? filesPaths,
+  void addCustomFile({
+    required String key,
+    required String path,
   }) {
     _runIfInitialized(
-      () => filesPaths == null
-          ? _customFilesHolder.clear()
-          : _customFilesHolder.setCustomFiles(filesPaths),
+      () => _customFilesHolder.addCustomFile(key: key, path: path),
     );
   }
 
