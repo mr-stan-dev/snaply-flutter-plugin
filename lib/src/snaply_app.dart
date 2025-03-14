@@ -1,38 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:snaply/snaply.dart';
+import 'package:snaply/src/snaply_initializer.dart';
 import 'package:snaply/src/ui/theme/snaply_theme.dart';
 import 'package:snaply/src/ui/widgets/root/snaply_root_widget.dart';
 
-/// A widget that provides bug reporting functionality by wrapping your app.
-///
-/// The [SnaplyApp] widget sets up the necessary environment for
-/// the bug reporting interface.
-///
-/// When [SnaplyReporter.isEnabled] is false, this widget simply returns
-/// the child without adding any overhead.
-///
-/// Example usage:
-/// ```dart
-/// void main() {
-///   runApp(
-///     SnaplyApp(
-///       child: MaterialApp(
-///         home: MyHomePage(),
-///       ),
-///     ),
-///   );
-/// }
-/// ```
-///
-class SnaplyApp extends StatelessWidget {
+class SnaplyApp extends StatefulWidget {
   /// Creates a SnaplyApp widget.
   ///
   /// The [child] parameter must not be null and typically would be your
   /// application's root widget (usually MaterialApp or CupertinoApp).
   const SnaplyApp({
     required this.child,
+    this.mode = const SharingFilesMode(),
+    this.isVisible = true,
     super.key,
   });
+
+  final SnaplyReporterMode mode;
+  final bool isVisible;
 
   /// The application widget that Snaply will wrap.
   ///
@@ -41,18 +26,40 @@ class SnaplyApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    // If disabled, simply return the child widget
-    if (!SnaplyReporter.instance.isEnabled) {
-      return child;
+  State<SnaplyApp> createState() => _SnaplyAppState();
+}
+
+class _SnaplyAppState extends State<SnaplyApp> {
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    try {
+      await SnaplyInitializer.instance.init(widget.mode);
+      SnaplyReporter.instance.setVisibility(isVisible: widget.isVisible);
+      setState(() => _isInitialized = true);
+    } catch (e) {
+      debugPrint('Failed to init Snaply: $e');
     }
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      _isInitialized ? _childWithSnaplyOverlay() : widget.child;
+
+  Widget _childWithSnaplyOverlay() {
     // Directionality widget is needed to ensure Stack works as expected
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          child,
+          widget.child,
           Theme(
             data: SnaplyTheme.defaultTheme,
             child: const SnaplyRootWidget(),

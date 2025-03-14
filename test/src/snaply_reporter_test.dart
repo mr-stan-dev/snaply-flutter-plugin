@@ -57,10 +57,10 @@ void main() {
   group('initialization', () {
     test('isEnabled reflects configuration holder state', () {
       when(() => configHolder.isEnabled).thenReturn(true);
-      expect(reporter.isEnabled, isTrue);
+      expect(reporter._isInitialized, isTrue);
 
       when(() => configHolder.isEnabled).thenReturn(false);
-      expect(reporter.isEnabled, isFalse);
+      expect(reporter._isInitialized, isFalse);
     });
 
     test('init sets default mode when no mode provided', () async {

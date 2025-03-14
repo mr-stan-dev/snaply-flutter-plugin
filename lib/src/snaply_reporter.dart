@@ -2,6 +2,7 @@ import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
+import 'package:snaply/src/snaply_initializer.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
 import 'package:snaply/src/snaply_reporter_mode.dart';
 
@@ -12,26 +13,12 @@ import 'package:snaply/src/snaply_reporter_mode.dart';
 abstract interface class SnaplyReporter {
   /// Singleton instance with default configuration.
   static final SnaplyReporter instance = SnaplyReporterImpl(
+    initializer: SnaplyInitializer.instance,
     configHolder: ConfigurationHolder.instance,
     attributesHolder: CustomAttributesHolder.instance,
     customFilesHolder: CustomFilesHolder.instance,
     logger: SnaplyLogger.instance,
   );
-
-  /// Whether the reporter is currently enabled.
-  ///
-  /// The reporter is enabled after successful initialization via [init].
-  /// When disabled:
-  /// * All operations become no-ops
-  /// * No resources are allocated
-  /// * No UI elements are shown
-  /// * No data is collected or stored
-  bool get isEnabled;
-
-  /// Initializes the reporter with optional reporting [mode].
-  ///
-  /// Default mode is [SharingFilesMode].
-  Future<void> init({SnaplyReporterMode? mode});
 
   /// Controls report activation button visibility.
   ///
