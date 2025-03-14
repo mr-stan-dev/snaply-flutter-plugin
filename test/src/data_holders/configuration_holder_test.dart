@@ -36,7 +36,7 @@ void main() {
       });
 
       test('setMode sets mode and enables holder', () {
-        final mode = SharingFilesMode();
+        const mode = SharingFilesMode();
         holder.setMode(mode);
         expect(holder.isEnabled, isTrue);
         expect(holder.mode, isA<SharingFilesMode>());
@@ -44,7 +44,7 @@ void main() {
 
       test('setMode throws when called twice', () {
         expect(
-          () => ConfigurationHolder.instance.setMode(SharingFilesMode()),
+          () => ConfigurationHolder.instance.setMode(const SharingFilesMode()),
           throwsA(
             isA<Exception>().having(
               (e) => e.toString(),

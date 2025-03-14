@@ -4,7 +4,6 @@ import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_initializer.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
-import 'package:snaply/src/snaply_reporter_mode.dart';
 
 /// Interface for capturing and managing bug reports with rich context.
 ///

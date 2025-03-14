@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:snaply/src/snaply_reporter_mode.dart';
 
 class ConfigurationHolder {
   ConfigurationHolder._();
@@ -17,6 +18,24 @@ class ConfigurationHolder {
   final VisibilityNotifier visibility = VisibilityNotifier();
 
   bool get isVisible => visibility.value;
+
+  SnaplyReporterMode? _mode;
+
+  bool get isEnabled => _mode != null;
+
+  SnaplyReporterMode get mode {
+    if (_mode == null) {
+      throw Exception('Attempt to get mode when it is not enabled');
+    }
+    return _mode!;
+  }
+
+  void setMode(SnaplyReporterMode mode) {
+    if (_mode != null) {
+      throw Exception('SnaplyReporterMode can be set only once');
+    }
+    _mode = mode;
+  }
 }
 
 // True (visible) by default
