@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:snaply/snaply.dart';
+import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
@@ -19,12 +20,15 @@ class MockSnaplyLogger extends Mock implements SnaplyLogger {}
 
 class MockSnaplyInitializer extends Mock implements SnaplyInitializer {}
 
+class MockCallbacksHolder extends Mock implements CallbacksHolder {}
+
 void main() {
   late MockConfigurationHolder configHolder;
   late MockCustomAttributesHolder attributesHolder;
   late MockCustomFilesHolder customFilesHolder;
   late MockSnaplyLogger logger;
   late MockSnaplyInitializer initializer;
+  late MockCallbacksHolder callbacksHolder;
   late SnaplyReporter reporter;
   late VisibilityNotifier visibilityNotifier;
 
@@ -38,6 +42,7 @@ void main() {
     customFilesHolder = MockCustomFilesHolder();
     logger = MockSnaplyLogger();
     initializer = MockSnaplyInitializer();
+    callbacksHolder = MockCallbacksHolder();
     visibilityNotifier = VisibilityNotifier();
 
     // Set up default behaviors
@@ -52,11 +57,12 @@ void main() {
       attributesHolder: attributesHolder,
       customFilesHolder: customFilesHolder,
       logger: logger,
+      callbacksHolder: callbacksHolder,
     );
   });
 
   group('SnaplyReporter', () {
-    test('setVisibility updates configuration when enabled', () {
+    test('setVisibility updates configuration when initialized', () {
       reporter.setVisibility(isVisible: true);
       expect(visibilityNotifier.value, true);
 
@@ -64,7 +70,7 @@ void main() {
       expect(visibilityNotifier.value, false);
     });
 
-    test('setAttributes updates attributes when enabled', () async {
+    test('setAttributes updates attributes when initialized', () async {
       when(() => initializer.isInitialized).thenReturn(true);
 
       final attributes = {'key': 'value'};
@@ -72,7 +78,7 @@ void main() {
       verify(() => attributesHolder.addAttributes(attributes)).called(1);
     });
 
-    test('log adds message when enabled', () {
+    test('log adds message when initialized', () {
       when(() => initializer.isInitialized).thenReturn(true);
 
       const message = 'test message';
@@ -80,7 +86,7 @@ void main() {
       verify(() => logger.addLog(message: message)).called(1);
     });
 
-    test('setVisibility does nothing when reporter is disabled', () {
+    test('setVisibility does nothing when reporter is not initialized', () {
       when(() => initializer.isInitialized).thenReturn(false);
 
       final initialValue = visibilityNotifier.value;
@@ -90,7 +96,8 @@ void main() {
       expect(visibilityNotifier.value, equals(initialValue));
     });
 
-    test('setAttributes does nothing when reporter is disabled', () async {
+    test('setAttributes does nothing when reporter is not initialized',
+        () async {
       when(() => initializer.isInitialized).thenReturn(false);
       final attributes = {'key': 'value'};
 
@@ -98,7 +105,7 @@ void main() {
       verifyNever(() => attributesHolder.addAttributes(any()));
     });
 
-    test('log does nothing when reporter is disabled', () {
+    test('log does nothing when reporter is not initialized', () {
       when(() => initializer.isInitialized).thenReturn(false);
       when(() => logger.addLog(message: any(named: 'message')))
           .thenAnswer((_) => {});
@@ -133,6 +140,64 @@ void main() {
       verify(
         () => logger.addLog(message: r'message with special chars !@#$%^&*()'),
       ).called(1);
+    });
+
+    test('setCallbacks updates onReportReview callback', () async {
+      Future<void> onReportReview() async {}
+      reporter.setCallbacks(onReportReview: onReportReview);
+      verify(() => callbacksHolder.onReportReview = onReportReview).called(1);
+    });
+
+    test('setCallbacks can remove callback when null is provided', () async {
+      Future<void> callback() async {}
+
+      // First set a callback
+      reporter.setCallbacks(onReportReview: callback);
+      verify(() => callbacksHolder.onReportReview = callback).called(1);
+
+      // Then remove it by setting null
+      reporter.setCallbacks();
+      verifyNever(() => callbacksHolder.onReportReview = callback);
+    });
+
+    test('setCallbacks can be called multiple times', () async {
+      Future<void> firstCallback() async {}
+      Future<void> secondCallback() async {}
+
+      reporter.setCallbacks(onReportReview: firstCallback);
+      verify(() => callbacksHolder.onReportReview = firstCallback).called(1);
+
+      reporter.setCallbacks(onReportReview: secondCallback);
+      verify(() => callbacksHolder.onReportReview = secondCallback).called(1);
+
+      // Can also set to null after setting callbacks
+      reporter.setCallbacks();
+      verifyNever(() => callbacksHolder.onReportReview = firstCallback);
+      verifyNever(() => callbacksHolder.onReportReview = secondCallback);
+    });
+
+    test('setCallbacks can update callback', () async {
+      Future<void> callback() async {}
+      Future<void> emptyCallback() async {}
+
+      reporter.setCallbacks(onReportReview: callback);
+      verify(() => callbacksHolder.onReportReview = callback).called(1);
+
+      reporter.setCallbacks(onReportReview: emptyCallback);
+      verify(() => callbacksHolder.onReportReview = emptyCallback).called(1);
+    });
+
+    test('setCallbacks does not work when reporter is not initialized',
+        () async {
+      when(() => initializer.isInitialized).thenReturn(false);
+      Future<void> callback() async {}
+
+      reporter.setCallbacks(onReportReview: callback);
+      verifyNever(() => callbacksHolder.onReportReview = callback);
+
+      // Also verify that setting null doesn't work when not initialized
+      reporter.setCallbacks();
+      verifyNever(() => callbacksHolder.onReportReview = null);
     });
   });
 }

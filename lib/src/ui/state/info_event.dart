@@ -15,7 +15,7 @@ class ReportUploadedEvent extends InfoEvent {
 }
 
 class PlainInfo extends InfoEvent {
-  PlainInfo(
+  const PlainInfo(
     this.infoMsg, {
     super.autoHideDelay = const Duration(seconds: 3),
   });
@@ -36,7 +36,7 @@ class PlainInfo extends InfoEvent {
 }
 
 class ErrorEvent extends InfoEvent {
-  ErrorEvent(this.errorMsg, {super.autoHideDelay});
+  const ErrorEvent(this.errorMsg, {super.autoHideDelay});
 
   final String errorMsg;
 }

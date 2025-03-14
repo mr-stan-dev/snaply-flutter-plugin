@@ -34,7 +34,7 @@ void main() {
 
     testWidgets('shows correct title for viewing files state', (tester) async {
       final state = SnaplyState.initial().copyWith(
-        reportingStage: ViewingFiles(isMediaFiles: true, index: 0),
+        reportingStage: const ViewingFiles(isMediaFiles: true, index: 0),
       );
 
       await pumpAppBar(tester, state);

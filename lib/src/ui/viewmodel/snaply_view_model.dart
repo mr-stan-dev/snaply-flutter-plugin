@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:snaply/snaply.dart';
+import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/logger/default_logs.dart';
@@ -69,8 +70,9 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
         await _takeScreenshot();
       case ViewFileFullScreen():
         if (!action.isMediaFiles) {
-          // Build here so users can see a fresh version of attrs in text file
-          await _addExtraFiles();
+          /// Build here so users can see a fresh version of attrs in text file
+          /// as we might update report attrs (title, severity, etc..)
+          await _buildExtraFiles();
         }
         value = value.copyWith(
           reportingStage: ViewingFiles(
@@ -96,8 +98,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       case ClearInfoWidgets():
         _uiEventsController.add(ClearAllWidgets());
       case ReviewReport():
-        await _addExtraFiles();
-        value = value.copyWith(reportingStage: ViewingReport());
+        await _reviewReport();
       case ShareReportFile():
         await _shareReportFile(action.file);
       case ShareReport():
@@ -122,7 +123,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
     if (value.screenshotsLimitReached) {
       const msg =
           'Screenshots limit reached (${SnaplyState.maxScreenshotsNumber})';
-      _uiEventsController.add(PlainInfo(msg));
+      _uiEventsController.add(const PlainInfo(msg));
       return;
     }
     try {
@@ -151,7 +152,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
   Future<void> _startVideoRecording() async {
     if (value.videosLimitReached) {
       const msg = 'Video files limit reached (${SnaplyState.maxVideosNumber})';
-      _uiEventsController.add(PlainInfo(msg));
+      _uiEventsController.add(const PlainInfo(msg));
       return;
     }
     try {
@@ -183,15 +184,12 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       final videoFile = await _mediaManager.stopVideoRecording(
         videoStartedAt: _videoStartedAt,
       );
-      // As we'll trigger ViewingReport stage we need to add extra files
-      await _addExtraFiles();
       SnaplyReporter.instance.log(message: DefaultLogs.screenVideoFinished);
       _uiEventsController.add(PlainInfo.short('Screen video taken'));
       value = value.copyWith(
-        controlsState: ControlsState.invisible,
         mediaFiles: [...value.mediaFiles, videoFile],
-        reportingStage: ViewingReport(),
       );
+      await _reviewReport();
     } catch (e, s) {
       value = value.copyWith(controlsState: ControlsState.idle);
       _showError(e, s, errorMsg: 'Stop recording error');
@@ -220,7 +218,26 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
     _videoProgressSec = 0;
   }
 
-  Future<void> _addExtraFiles() async {
+  Future<void> _reviewReport() async {
+    value = value.copyWith(
+      controlsState: ControlsState.invisible,
+      reportingStage: Loading.preparing,
+    );
+    try {
+      await CallbacksHolder.instance.onReportReview?.call();
+    } catch (e) {
+      _uiEventsController.add(
+        const ErrorEvent(
+          'Error while calling onReportReview',
+          autoHideDelay: Duration(seconds: 3),
+        ),
+      );
+    }
+    await _buildExtraFiles();
+    value = value.copyWith(reportingStage: ViewingReport());
+  }
+
+  Future<void> _buildExtraFiles() async {
     try {
       final files = await _extraFilesRepository.getExtraFiles(
         reportAttrs: value.reportAttrs,
@@ -245,7 +262,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
   Future<void> _shareReport(bool asArchive) async {
     try {
       // Make sure extra files are up to date
-      await _addExtraFiles();
+      await _buildExtraFiles();
       await _shareReportUsecase.call(
         reportFiles: [
           ...value.mediaFiles,

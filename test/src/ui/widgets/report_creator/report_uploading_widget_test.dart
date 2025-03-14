@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:snaply/src/ui/state/reporting_stage.dart';
 import 'package:snaply/src/ui/widgets/report_creator/report_uploading_widget.dart';
 
 void main() {
@@ -7,7 +8,9 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: ReportUploadingWidget(),
+          body: ReportLoadingWidget(
+            loading: Loading.preparing,
+          ),
         ),
       ),
     );
@@ -18,7 +21,7 @@ void main() {
       await pumpUploadingWidget(tester);
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.text('Uploading report'), findsOneWidget);
+      expect(find.text('Preparing report data'), findsOneWidget);
     });
 
     testWidgets('centers content vertically', (tester) async {
