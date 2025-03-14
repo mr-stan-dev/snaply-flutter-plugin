@@ -30,7 +30,10 @@ abstract interface class SnaplyReporter {
   ///
   /// Replaces any previously set attributes. Values are included alongside
   /// automatically collected device and system information.
-  void setAttributes(Map<String, String> attributes);
+  void setAttributes({
+    required String attrKey,
+    required Map<String, String> attrMap,
+  });
 
   /// Adds a timestamped message to logs file.
   ///

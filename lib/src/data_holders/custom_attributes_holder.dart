@@ -5,15 +5,14 @@ class CustomAttributesHolder {
 
   static CustomAttributesHolder get instance => _instance;
 
-  final Map<String, String> _attributes = {};
+  final Map<String, Map<String, String>> _attributes = {};
 
-  Map<String, Map<String, String>> get attributes => _attributes.isEmpty
-      ? {}
-      : {
-          'custom_attrs': _attributes,
-        };
+  Map<String, Map<String, String>> get attributes => _attributes;
 
-  void addAttributes(Map<String, String> customAttributes) {
-    _attributes.addAll(customAttributes);
+  void addAttributes({
+    required String attrKey,
+    required Map<String, String> attrMap,
+  }) {
+    _attributes[attrKey] = attrMap;
   }
 }

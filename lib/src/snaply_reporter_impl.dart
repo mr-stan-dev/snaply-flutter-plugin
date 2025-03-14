@@ -37,9 +37,15 @@ class SnaplyReporterImpl implements SnaplyReporter {
   }
 
   @override
-  void setAttributes(Map<String, String> attributes) {
+  void setAttributes({
+    required String attrKey,
+    required Map<String, String> attrMap,
+  }) {
     _runIfInitialized(
-      () => _attributesHolder.addAttributes(attributes),
+      () => _attributesHolder.addAttributes(
+        attrKey: attrKey,
+        attrMap: attrMap,
+      ),
     );
   }
 
