@@ -13,18 +13,13 @@ class CustomFilesHolder {
 
   Map<String, String> get customFiles => _customFiles;
 
-  void setCustomFiles(Map<String, String> filesPaths) {
-    filesPaths.forEach(
-      (key, path) {
-        // Add if we have space or if updating existing key
-        if (_customFiles.length < maxFiles || _customFiles.containsKey(key)) {
-          _customFiles[key] = path;
-        }
-      },
-    );
-  }
-
-  void clear() {
-    _customFiles.clear();
+  void addCustomFile({
+    required String key,
+    required String path,
+  }) {
+    // Add if we have space or if updating existing key
+    if (_customFiles.length < maxFiles || _customFiles.containsKey(key)) {
+      _customFiles[key] = path;
+    }
   }
 }
