@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:snaply/snaply.dart';
-import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/logger/default_logs.dart';
@@ -224,7 +223,7 @@ class SnaplyViewModel extends ValueNotifier<SnaplyState>
       reportingStage: Loading.preparing,
     );
     try {
-      await CallbacksHolder.instance.onReportReview?.call();
+      await ConfigurationHolder.instance.onReportReview?.call();
     } catch (e) {
       _uiEventsController.add(
         const ErrorEvent(
