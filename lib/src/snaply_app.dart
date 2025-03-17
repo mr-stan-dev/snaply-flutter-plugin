@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:snaply/snaply.dart';
-import 'package:snaply/src/snaply_initializer.dart';
+import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/ui/theme/snaply_theme.dart';
 import 'package:snaply/src/ui/widgets/root/snaply_root_widget.dart';
 
@@ -40,7 +40,7 @@ class _SnaplyAppState extends State<SnaplyApp> {
 
   Future<void> _init() async {
     try {
-      await SnaplyInitializer.instance.init(widget.mode);
+      await ConfigurationHolder.instance.configure(widget.mode);
       SnaplyReporter.instance.setVisibility(isVisible: widget.isVisible);
       setState(() => _isInitialized = true);
     } catch (e) {

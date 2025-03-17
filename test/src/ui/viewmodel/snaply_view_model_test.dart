@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/entities/severity.dart';
@@ -240,7 +239,7 @@ void main() {
 
       // Mock the callback to throw an error
       final onReviewError = Exception('Review error');
-      CallbacksHolder.instance.onReportReview = () async {
+      ConfigurationHolder.instance.onReportReview = () async {
         throw onReviewError;
       };
 

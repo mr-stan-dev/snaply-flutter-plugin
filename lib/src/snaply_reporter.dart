@@ -1,9 +1,7 @@
-import 'package:snaply/src/data_holders/callbacks_holder.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
-import 'package:snaply/src/snaply_initializer.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
 
 /// Interface for capturing and managing bug reports with rich context.
@@ -13,12 +11,10 @@ import 'package:snaply/src/snaply_reporter_impl.dart';
 abstract interface class SnaplyReporter {
   /// Singleton instance with default configuration.
   static final SnaplyReporter instance = SnaplyReporterImpl(
-    initializer: SnaplyInitializer.instance,
     configHolder: ConfigurationHolder.instance,
     attributesHolder: CustomAttributesHolder.instance,
     customFilesHolder: CustomFilesHolder.instance,
     logger: SnaplyLogger.instance,
-    callbacksHolder: CallbacksHolder.instance,
   );
 
   /// Controls report activation button visibility.
@@ -68,22 +64,17 @@ abstract interface class SnaplyReporter {
   ///
   /// Example:
   /// ```dart
-  /// reporter.setCallbacks(
+  /// reporter.registerCallbacks(
   ///   onReportReview: () async {
   ///     SnaplyReporter.setAttributes(...)
   ///     SnaplyReporter.setCustomFiles(...)
   ///   },
   /// );
-  ///
-  /// // Remove the callback
-  /// reporter.setCallbacks(
-  ///   onReportReview: null,
-  /// );
   /// ```
   ///
   /// Note: The callback will only be executed if the reporter is initialized.
   /// Multiple calls to this method will override previously set callbacks.
-  void setCallbacks({
+  void registerCallbacks({
     Future<void> Function()? onReportReview,
   });
 }

@@ -19,22 +19,16 @@ class ConfigurationHolder {
 
   bool get isVisible => visibility.value;
 
-  SnaplyReporterMode? _mode;
+  bool _isInitialized = false;
+  late final SnaplyReporterMode mode;
 
-  bool get isEnabled => _mode != null;
+  Future<void> Function()? onReportReview;
 
-  SnaplyReporterMode get mode {
-    if (_mode == null) {
-      throw Exception('Attempt to get mode when it is not enabled');
-    }
-    return _mode!;
-  }
+  bool get isInitialized => _isInitialized;
 
-  void setMode(SnaplyReporterMode mode) {
-    if (_mode != null) {
-      throw Exception('SnaplyReporterMode can be set only once');
-    }
-    _mode = mode;
+  Future<void> configure(SnaplyReporterMode mode) async {
+    this.mode = mode;
+    _isInitialized = true;
   }
 }
 
