@@ -9,52 +9,38 @@ class SnaplyFileManager {
      * Returns the directory for storing Snaply temporary files.
      * Creates the directory if it doesn't exist.
      *
-     * @return The Snaply files directory URL
+     * @return The Snaply files directory path
      * @throws If directory creation fails
      */
-    func getSnaplyFilesDir(_ result: @escaping FlutterResult) {
-        do {
-            let snaplyDir = try getSnaplyFilesDirURL()
-            result(snaplyDir.path)
-        } catch {
-            result(FlutterError(
-                code: "DIRECTORY_ERROR",
-                message: "Failed to get/create Snaply directory: \(error.localizedDescription)",
-                details: nil
-            ))
-        }
-    }
-    
-    // Private helper that returns URL
-    private func getSnaplyFilesDirURL() throws -> URL {
-        let fileManager = FileManager.default
-        
-        // Get cache directory
-        guard let cacheDir = fileManager.urls(
-            for: .cachesDirectory,
-            in: .userDomainMask
-        ).first else {
-            throw NSError(
-                domain: "SnaplyFileManager",
-                code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "Cache directory not available"]
-            )
-        }
-        
-        // Create cache directory if needed
-        try fileManager.createDirectory(
-            at: cacheDir,
-            withIntermediateDirectories: true
-        )
-        
-        // Create and return snaply directory
-        let snaplyDir = cacheDir.appendingPathComponent(snaplyFilesDir)
-        try fileManager.createDirectory(
-            at: snaplyDir,
-            withIntermediateDirectories: true
-        )
-        
-        return snaplyDir
+    func getSnaplyFilesDir() throws -> String {
+                let fileManager = FileManager.default
+
+                // Get cache directory
+                guard let cacheDir = fileManager.urls(
+                    for: .cachesDirectory,
+                    in: .userDomainMask
+                ).first else {
+                    throw NSError(
+                        domain: "SnaplyFileManager",
+                        code: 1,
+                        userInfo: [NSLocalizedDescriptionKey: "Cache directory not available"]
+                    )
+                }
+
+                // Create cache directory if needed
+                try fileManager.createDirectory(
+                    at: cacheDir,
+                    withIntermediateDirectories: true
+                )
+
+                // Create and return snaply directory
+                let snaplyDir = cacheDir.appendingPathComponent(snaplyFilesDir)
+                try fileManager.createDirectory(
+                    at: snaplyDir,
+                    withIntermediateDirectories: true
+                )
+
+                return snaplyDir.path
     }
     
     func shareFiles(_ filePaths: [String]?, result: @escaping FlutterResult) {

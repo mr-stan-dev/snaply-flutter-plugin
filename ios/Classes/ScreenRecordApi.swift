@@ -18,12 +18,15 @@ public class ScreenRecordApi {
     private let nameVideo = "snaply_screen_recording.mp4"
     private var recordAudio = false
     private let screenSize = UIScreen.main.bounds
+    private var snaplyDirectory: String?
     
     // MARK: - Public Methods
     
     /// Starts screen recording with optional audio.
-    /// - Parameter result: Flutter result callback
-    @objc func startRecording(result: @escaping FlutterResult) {
+    /// - Parameters:
+    ///   - directory: Directory path where the video should be saved
+    ///   - result: Flutter result callback
+    @objc func startRecording(directory: String, result: @escaping FlutterResult) {
         guard #available(iOS 11.0, *) else {
             result(FlutterError(code: "UNSUPPORTED_VERSION",
                               message: "Screen recording requires iOS 11.0 or later",
@@ -39,6 +42,7 @@ public class ScreenRecordApi {
         }
         
         self.result = result
+        self.snaplyDirectory = directory
         
         do {
             try setupVideoWriter()
@@ -83,8 +87,11 @@ public class ScreenRecordApi {
     // MARK: - Private Methods
     
     private func setupVideoWriter() throws {
-        let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
-        videoOutputURL = URL(fileURLWithPath: documentsPath.appendingPathComponent(nameVideo))
+        guard let directory = snaplyDirectory else {
+            throw RecordingError.invalidOutputURL
+        }
+        
+        videoOutputURL = URL(fileURLWithPath: (directory as NSString).appendingPathComponent(nameVideo))
         
         // Clean up existing file
         if let url = videoOutputURL {
@@ -93,12 +100,6 @@ public class ScreenRecordApi {
         
         guard let outputURL = videoOutputURL else {
             throw RecordingError.invalidOutputURL
-        }
-        
-        // Check if directory exists and is writable
-        let directory = outputURL.deletingLastPathComponent()
-        if !FileManager.default.fileExists(atPath: directory.path) {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         }
         
         videoWriter = try AVAssetWriter(outputURL: outputURL, fileType: .mp4)
@@ -269,6 +270,7 @@ public class ScreenRecordApi {
         audioInput = nil
         videoOutputURL = nil
         result = nil
+        snaplyDirectory = nil
     }
 }
 
