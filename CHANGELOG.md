@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.1-alpha.6 (2025-03-19)
+
+### Changes
+
+- Refactor ios file manager and change path for video recording (#35)
+- Fix callbacks registration and refactor (#34)
+- [Breaking] Refactor custom attrs and files setting (#33)
+- Implement callbacks for extra files (#32)
+- [Breaking] Refactor Snaply initialisation logic (#31)
+
 ## 0.0.1-alpha.5 (2025-03-10)
 
 ### Changes
