@@ -3,7 +3,6 @@ import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
-import 'package:snaply/src/snaply_reporter_mode.dart';
 
 /// Interface for capturing and managing bug reports with rich context.
 ///
@@ -18,21 +17,6 @@ abstract interface class SnaplyReporter {
     logger: SnaplyLogger.instance,
   );
 
-  /// Whether the reporter is currently enabled.
-  ///
-  /// The reporter is enabled after successful initialization via [init].
-  /// When disabled:
-  /// * All operations become no-ops
-  /// * No resources are allocated
-  /// * No UI elements are shown
-  /// * No data is collected or stored
-  bool get isEnabled;
-
-  /// Initializes the reporter with optional reporting [mode].
-  ///
-  /// Default mode is [SharingFilesMode].
-  Future<void> init({SnaplyReporterMode? mode});
-
   /// Controls report activation button visibility.
   ///
   /// No effect during active report gathering/reviewing or when disabled.
@@ -42,7 +26,10 @@ abstract interface class SnaplyReporter {
   ///
   /// Replaces any previously set attributes. Values are included alongside
   /// automatically collected device and system information.
-  void setAttributes(Map<String, String> attributes);
+  void setAttributes({
+    required String attrKey,
+    required Map<String, String> attrMap,
+  });
 
   /// Adds a timestamped message to logs file.
   ///
@@ -50,17 +37,44 @@ abstract interface class SnaplyReporter {
   /// Messages are automatically timestamped when added.
   void log({required String message});
 
-  /// Sets custom files to be included in the bug report. Max 5 files.
+  /// Add custom file to be included in the bug report. Max 5 files.
   ///
   /// Each file must be:
   /// * Less than 5MB in size
   /// * Accessible with read permissions
   /// * Currently existing on the device
   ///
-  /// [filesPaths] is a map where:
-  /// * Key: A descriptive name for the file
-  /// * Value: Absolute path to the file on the device
+  void addCustomFile({
+    required String key,
+    required String path,
+  });
+
+  /// Sets callback functions to be invoked during the bug reporting process.
   ///
-  /// If [filesPaths] is null it clears all custom files
-  void setCustomFiles({required Map<String, String>? filesPaths});
+  /// Use this method to configure custom behavior that should be executed at
+  /// specific points during the bug reporting flow.
+  ///
+  /// Parameters:
+  /// * [onReportReview]: An optional callback function that is invoked when the
+  /// user starts reviewing their bug report. This is useful for setting custom
+  /// attributes and files just before report review screen is visible.
+  /// The callback is async function so you can perform any long-run
+  /// operations to get and set all the required data.
+  /// If null is provided, any previously set callback will be removed.
+  ///
+  /// Example:
+  /// ```dart
+  /// reporter.registerCallbacks(
+  ///   onReportReview: () async {
+  ///     SnaplyReporter.setAttributes(...)
+  ///     SnaplyReporter.setCustomFiles(...)
+  ///   },
+  /// );
+  /// ```
+  ///
+  /// Note: The callback will only be executed if the reporter is initialized.
+  /// Multiple calls to this method will override previously set callbacks.
+  void registerCallbacks({
+    Future<void> Function()? onReportReview,
+  });
 }

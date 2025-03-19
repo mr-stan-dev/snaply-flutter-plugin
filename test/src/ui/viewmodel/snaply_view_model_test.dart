@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:snaply/src/data_holders/configuration_holder.dart';
 import 'package:snaply/src/entities/report_file.dart';
 import 'package:snaply/src/entities/severity.dart';
-import 'package:snaply/src/logger/log_record.dart';
 import 'package:snaply/src/media_manager/media_files_manager.dart';
 import 'package:snaply/src/repository/extra_files_repository.dart';
 import 'package:snaply/src/ui/state/info_event.dart';
@@ -204,69 +203,93 @@ void main() {
     });
   });
 
-  group('report sharing', () {
-    test('share report calls usecase with all files', () async {
-      final file = ScreenshotFile(
-        filePath: 'path',
-        createdAt: DateTime.timestamp(),
-      );
-
+  group('report reviewing', () {
+    test('review report updates state and builds extra files', () async {
       final extraFiles = [
-        LogsFile(
-          logs: [LogRecord(message: 'test log', timestamp: DateTime.now())],
-        ),
-        const AttributesFile(
-          attrs: {
-            'test': {'key': 'value'},
-          },
+        ScreenshotFile(
+          filePath: 'test/extra.txt',
+          createdAt: DateTime.timestamp(),
         ),
       ];
-
-      // Set initial state with title and severity
-      viewModel.value = viewModel.value.copyWith(
-        reportingStage: ViewingReport(),
-        mediaFiles: [file],
-        title: 'Test Report',
-        severity: Severity.high,
-      );
-
-      when(
-        () => shareReportUsecase.call(
-          reportFiles: any(named: 'reportFiles'),
-          asArchive: any(named: 'asArchive'),
-        ),
-      ).thenAnswer((_) => Future.value());
-
       when(
         () => extraFilesRepository.getExtraFiles(
           reportAttrs: any(named: 'reportAttrs'),
         ),
       ).thenAnswer((_) async => extraFiles);
 
-      await viewModel.act(ShareReport(asArchive: true));
+      await viewModel.act(ReviewReport());
       await pumpEvents();
 
+      expect(viewModel.value.controlsState, ControlsState.invisible);
+      expect(viewModel.value.reportingStage, isA<ViewingReport>());
+      expect(viewModel.value.extraFiles, equals(extraFiles));
       verify(
-        () => shareReportUsecase.call(
-          reportFiles: [...viewModel.value.mediaFiles, ...extraFiles],
-          asArchive: true,
+        () => extraFilesRepository.getExtraFiles(
+          reportAttrs: any(named: 'reportAttrs'),
         ),
       ).called(1);
     });
 
+    test('review report handles onReportReview callback error', () async {
+      when(
+        () => extraFilesRepository.getExtraFiles(
+          reportAttrs: any(named: 'reportAttrs'),
+        ),
+      ).thenAnswer((_) async => []);
+
+      // Mock the callback to throw an error
+      final onReviewError = Exception('Review error');
+      ConfigurationHolder.instance.onReportReview = () async {
+        throw onReviewError;
+      };
+
+      await viewModel.act(ReviewReport());
+      await pumpEvents();
+
+      expect(viewModel.value.controlsState, ControlsState.invisible);
+      expect(viewModel.value.reportingStage, isA<ViewingReport>());
+      expect(uiEvents.last, isA<ErrorEvent>());
+      expect(
+        (uiEvents.last as ErrorEvent).errorMsg,
+        contains('onReportReview'),
+      );
+    });
+
+    test('review report handles extra files error', () async {
+      when(
+        () => extraFilesRepository.getExtraFiles(
+          reportAttrs: any(named: 'reportAttrs'),
+        ),
+      ).thenThrow(Exception('Extra files error'));
+
+      await viewModel.act(ReviewReport());
+      await pumpEvents();
+
+      expect(viewModel.value.controlsState, ControlsState.invisible);
+      expect(viewModel.value.reportingStage, isA<ViewingReport>());
+      expect(uiEvents.last, isA<ErrorEvent>());
+      expect(
+        (uiEvents.last as ErrorEvent).errorMsg,
+        contains('Extra files error'),
+      );
+    });
+  });
+
+  group('report sharing', () {
     test('share report file calls usecase with single file', () async {
       final file = ScreenshotFile(
-        filePath: 'path',
+        filePath: 'test/screenshot.png',
         createdAt: DateTime.timestamp(),
       );
       when(
         () => shareReportUsecase.call(
-          reportFiles: any(named: 'reportFiles'),
-          asArchive: any(named: 'asArchive'),
+          reportFiles: [file],
+          asArchive: false,
         ),
-      ).thenAnswer((_) => Future.value());
+      ).thenAnswer((_) async => {});
 
       await viewModel.act(ShareReportFile(file: file));
+      await pumpEvents();
 
       verify(
         () => shareReportUsecase.call(
@@ -274,6 +297,67 @@ void main() {
           asArchive: false,
         ),
       ).called(1);
+    });
+
+    test('share report calls usecase with all files', () async {
+      final mediaFile = ScreenshotFile(
+        filePath: 'test/screenshot.png',
+        createdAt: DateTime.timestamp(),
+      );
+      final extraFiles = [
+        ScreenshotFile(
+          filePath: 'test/extra.txt',
+          createdAt: DateTime.timestamp(),
+        ),
+      ];
+
+      viewModel.value = viewModel.value.copyWith(
+        title: 'Test Report',
+        mediaFiles: [mediaFile],
+        severity: Severity.high,
+        reportingStage: ViewingReport(),
+      );
+
+      when(
+        () => extraFilesRepository.getExtraFiles(
+          reportAttrs: any(named: 'reportAttrs'),
+        ),
+      ).thenAnswer((_) async => extraFiles);
+
+      when(
+        () => shareReportUsecase.call(
+          reportFiles: [mediaFile, ...extraFiles],
+          asArchive: true,
+        ),
+      ).thenAnswer((_) async => {});
+
+      await viewModel.act(ShareReport(asArchive: true));
+      await pumpEvents();
+
+      verify(
+        () => shareReportUsecase.call(
+          reportFiles: [mediaFile, ...extraFiles],
+          asArchive: true,
+        ),
+      ).called(1);
+    });
+
+    test('share report handles error', () async {
+      when(
+        () => shareReportUsecase.call(
+          reportFiles: any(named: 'reportFiles'),
+          asArchive: any(named: 'asArchive'),
+        ),
+      ).thenThrow(Exception('Share error'));
+
+      await viewModel.act(ShareReport(asArchive: true));
+      await pumpEvents();
+
+      expect(uiEvents.last, isA<ErrorEvent>());
+      expect(
+        (uiEvents.last as ErrorEvent).errorMsg,
+        contains('Share report error'),
+      );
     });
   });
 }

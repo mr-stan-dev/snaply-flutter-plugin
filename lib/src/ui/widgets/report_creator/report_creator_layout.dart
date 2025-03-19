@@ -37,8 +37,8 @@ class ReportCreatorLayout extends StatelessWidget {
           files: reportState.isMediaFiles ? state.mediaFiles : state.extraFiles,
           initialIndex: reportState.index,
         );
-      case Loading():
-        return const ReportUploadingWidget();
+      case final Loading loading:
+        return ReportLoadingWidget(loading: loading);
     }
   }
 }

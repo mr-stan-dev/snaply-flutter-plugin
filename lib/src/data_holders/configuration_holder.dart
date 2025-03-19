@@ -15,27 +15,21 @@ class ConfigurationHolder {
   bool get useMediaProjection =>
       _configValues.contains('useAndroidMediaProjection');
 
-  SnaplyReporterMode? _mode;
-
-  SnaplyReporterMode get mode {
-    if (_mode == null) {
-      throw Exception('Attempt to get mode when it is not enabled');
-    }
-    return _mode!;
-  }
-
-  void setMode(SnaplyReporterMode? mode) {
-    if (isEnabled) {
-      throw Exception('SnaplyReporterMode can be set only once');
-    }
-    _mode = mode ?? SharingFilesMode();
-  }
-
-  bool get isEnabled => _mode != null;
-
   final VisibilityNotifier visibility = VisibilityNotifier();
 
   bool get isVisible => visibility.value;
+
+  bool _isInitialized = false;
+  late final SnaplyReporterMode mode;
+
+  Future<void> Function()? onReportReview;
+
+  bool get isInitialized => _isInitialized;
+
+  Future<void> configure(SnaplyReporterMode mode) async {
+    this.mode = mode;
+    _isInitialized = true;
+  }
 }
 
 // True (visible) by default

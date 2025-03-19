@@ -1,11 +1,13 @@
-sealed class ReportingStage {}
+sealed class ReportingStage {
+  const ReportingStage();
+}
 
 final class Gathering extends ReportingStage {}
 
 final class ViewingReport extends ReportingStage {}
 
 final class ViewingFiles extends ReportingStage {
-  ViewingFiles({
+  const ViewingFiles({
     required this.isMediaFiles,
     required this.index,
   });
@@ -14,4 +16,13 @@ final class ViewingFiles extends ReportingStage {
   final int index;
 }
 
-final class Loading extends ReportingStage {}
+final class Loading extends ReportingStage {
+  const Loading._({
+    required this.loadingMessage,
+  });
+
+  static const Loading preparing =
+      Loading._(loadingMessage: 'Preparing report data');
+
+  final String loadingMessage;
+}

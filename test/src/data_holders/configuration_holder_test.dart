@@ -16,43 +16,24 @@ void main() {
       expect(identical(holder1, holder2), isTrue);
     });
 
-    group('mode management', () {
-      // As holder is a singleton - the order of tests matters
-      test('isEnabled is false when mode is not set', () {
-        expect(holder.isEnabled, isFalse);
+    group('initialization', () {
+      test('isInitialized is false before configure', () {
+        expect(holder.isInitialized, isFalse);
       });
 
-      test('mode throws when accessed before being set', () {
+      test('mode throws when accessed before configuration', () {
         expect(
-          () => ConfigurationHolder.instance.mode,
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Attempt to get mode when it is not enabled'),
-            ),
-          ),
+          () => holder.mode,
+          throwsA(anything),
         );
       });
 
-      test('setMode sets mode and enables holder', () {
-        final mode = SharingFilesMode();
-        holder.setMode(mode);
-        expect(holder.isEnabled, isTrue);
-        expect(holder.mode, isA<SharingFilesMode>());
-      });
+      test('configure sets mode and enables holder', () async {
+        const mode = SharingFilesMode();
+        await holder.configure(mode);
 
-      test('setMode throws when called twice', () {
-        expect(
-          () => ConfigurationHolder.instance.setMode(SharingFilesMode()),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('SnaplyReporterMode can be set only once'),
-            ),
-          ),
-        );
+        expect(holder.isInitialized, isTrue);
+        expect(holder.mode, equals(mode));
       });
     });
 

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:snaply/src/ui/state/reporting_stage.dart';
 
-class ReportUploadingWidget extends StatelessWidget {
-  const ReportUploadingWidget({super.key});
+class ReportLoadingWidget extends StatelessWidget {
+  const ReportLoadingWidget({
+    required this.loading,
+    super.key,
+  });
+
+  final Loading loading;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +21,7 @@ class ReportUploadingWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Uploading report',
+                loading.loadingMessage,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),

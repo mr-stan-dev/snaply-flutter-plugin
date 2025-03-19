@@ -42,12 +42,12 @@ void main() {
 
     testWidgets('shows uploading widget in loading state', (tester) async {
       final state = SnaplyState.initial().copyWith(
-        reportingStage: Loading(),
+        reportingStage: Loading.preparing,
       );
 
       await pumpLayout(tester, state);
 
-      expect(find.byType(ReportUploadingWidget), findsOneWidget);
+      expect(find.byType(ReportLoadingWidget), findsOneWidget);
     });
   });
 }

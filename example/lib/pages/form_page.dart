@@ -22,12 +22,14 @@ class _FormPageState extends State<FormPage> {
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
-      SnaplyReporter.instance.setAttributes({
-        'user_name': _name ?? 'NA',
-        'user_email': _email ?? 'NA',
-        'user_age': _age.toString(),
-        'counter_value': widget.counterValue.toString(),
-      });
+      SnaplyReporter.instance.setAttributes(
+        attrKey: 'user_info',
+        attrMap: {
+          'user_name': _name ?? 'NA',
+          'user_email': _email ?? 'NA',
+          'user_age': _age.toString(),
+        },
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Form submitted!')),
       );

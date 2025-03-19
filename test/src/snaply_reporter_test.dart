@@ -8,9 +8,8 @@ import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter_impl.dart';
 
 class MockConfigurationHolder extends Mock implements ConfigurationHolder {
-  // Remove this override since we want to mock it normally
-  // @override
-  // void setMode(SnaplyReporterMode? mode) {}
+  @override
+  bool get isInitialized => true;
 }
 
 class MockCustomAttributesHolder extends Mock
@@ -30,7 +29,6 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(VisibilityNotifier());
-    registerFallbackValue(SharingFilesMode());
   });
 
   setUp(() {
@@ -42,7 +40,6 @@ void main() {
 
     // Set up default behaviors
     when(() => configHolder.visibility).thenReturn(visibilityNotifier);
-    when(() => configHolder.isEnabled).thenReturn(true);
     when(() => configHolder.isVisible)
         .thenAnswer((_) => visibilityNotifier.value);
 
@@ -54,83 +51,8 @@ void main() {
     );
   });
 
-  group('initialization', () {
-    test('isEnabled reflects configuration holder state', () {
-      when(() => configHolder.isEnabled).thenReturn(true);
-      expect(reporter.isEnabled, isTrue);
-
-      when(() => configHolder.isEnabled).thenReturn(false);
-      expect(reporter.isEnabled, isFalse);
-    });
-
-    test('init sets default mode when no mode provided', () async {
-      when(() => configHolder.isEnabled).thenReturn(false);
-
-      await reporter.init();
-
-      verify(() => configHolder.setMode(any())).called(1);
-    });
-
-    test('init sets provided mode', () async {
-      when(() => configHolder.isEnabled).thenReturn(false);
-      final mode = SharingFilesMode();
-
-      await reporter.init(mode: mode);
-
-      verify(() => configHolder.setMode(mode)).called(1);
-    });
-
-    test('init throws when attempting to initialize already enabled reporter',
-        () async {
-      when(() => configHolder.isEnabled).thenReturn(true);
-
-      when(() => configHolder.setMode(any()))
-          .thenThrow(Exception('SnaplyReporterMode can be set only once'));
-
-      expect(
-        () => reporter.init(),
-        throwsA(
-          isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('SnaplyReporterMode can be set only once'),
-          ),
-        ),
-      );
-    });
-  });
-
-  group('integration scenarios', () {
-    test('initialization enables reporter', () async {
-      when(() => configHolder.isEnabled).thenReturn(false);
-
-      await reporter.init();
-
-      verify(() => configHolder.setMode(any())).called(1);
-      // After init, subsequent calls should see reporter as enabled
-      when(() => configHolder.isEnabled).thenReturn(true);
-
-      // Now we can perform operations
-      reporter.setVisibility(isVisible: true);
-      expect(visibilityNotifier.value, true);
-    });
-
-    test('disabled reporter performs no operations', () async {
-      when(() => configHolder.isEnabled).thenReturn(false);
-
-      reporter
-        ..setVisibility(isVisible: false)
-        ..setAttributes({'key': 'value'})
-        ..log(message: 'test');
-
-      expect(visibilityNotifier.value, true);
-      verifyNever(() => attributesHolder.addAttributes(any()));
-      verifyNever(() => logger.addLog(message: any(named: 'message')));
-    });
-  });
-
   group('SnaplyReporter', () {
-    test('setVisibility updates configuration when enabled', () {
+    test('setVisibility updates configuration when initialized', () {
       reporter.setVisibility(isVisible: true);
       expect(visibilityNotifier.value, true);
 
@@ -138,65 +60,42 @@ void main() {
       expect(visibilityNotifier.value, false);
     });
 
-    test('setAttributes updates attributes when enabled', () async {
-      when(() => configHolder.isEnabled).thenReturn(true);
-
-      final attributes = {'key': 'value'};
-      reporter.setAttributes(attributes);
-      verify(() => attributesHolder.addAttributes(attributes)).called(1);
+    test('setAttributes updates attributes when initialized', () async {
+      const attrKey = 'testKey';
+      final attrMap = {'key': 'value'};
+      reporter.setAttributes(attrKey: attrKey, attrMap: attrMap);
+      verify(
+        () => attributesHolder.addAttributes(
+          attrKey: attrKey,
+          attrMap: attrMap,
+        ),
+      ).called(1);
     });
 
-    test('log adds message when enabled', () {
-      when(() => configHolder.isEnabled).thenReturn(true);
-
+    test('log adds message when initialized', () {
       const message = 'test message';
       reporter.log(message: message);
       verify(() => logger.addLog(message: message)).called(1);
     });
 
-    test('setVisibility does nothing when reporter is disabled', () {
-      when(() => configHolder.isEnabled).thenReturn(false);
-
-      final initialValue = visibilityNotifier.value;
-      reporter.setVisibility(isVisible: true);
-
-      // Verify the value didn't change
-      expect(visibilityNotifier.value, equals(initialValue));
-    });
-
-    test('setAttributes does nothing when reporter is disabled', () async {
-      when(() => configHolder.isEnabled).thenReturn(false);
-      final attributes = {'key': 'value'};
-
-      reporter.setAttributes(attributes);
-      verifyNever(() => attributesHolder.addAttributes(any()));
-    });
-
-    test('log does nothing when reporter is disabled', () {
-      when(() => configHolder.isEnabled).thenReturn(false);
-      when(() => logger.addLog(message: any(named: 'message')))
-          .thenAnswer((_) => {});
-      const message = 'test message';
-      reporter.log(message: message);
-      verifyNever(() => logger.addLog(message: message));
-    });
-
     test('setAttributes handles different attribute types', () {
-      when(() => configHolder.isEnabled).thenReturn(true);
-
-      final attributes = {
+      const attrKey = 'testKey';
+      final attrMap = {
         'string': 'value',
         'number': '42',
         'boolean': 'true',
       };
 
-      reporter.setAttributes(attributes);
-      verify(() => attributesHolder.addAttributes(attributes)).called(1);
+      reporter.setAttributes(attrKey: attrKey, attrMap: attrMap);
+      verify(
+        () => attributesHolder.addAttributes(
+          attrKey: attrKey,
+          attrMap: attrMap,
+        ),
+      ).called(1);
     });
 
     test('log handles different message types', () {
-      when(() => configHolder.isEnabled).thenReturn(true);
-
       reporter.log(message: 'simple message');
       verify(() => logger.addLog(message: 'simple message')).called(1);
 
@@ -207,6 +106,33 @@ void main() {
       verify(
         () => logger.addLog(message: r'message with special chars !@#$%^&*()'),
       ).called(1);
+    });
+
+    test('addCustomFile adds file', () async {
+      const key = 'testFile';
+      const path = '/path/to/file.txt';
+      reporter.addCustomFile(key: key, path: path);
+      verify(
+        () => customFilesHolder.addCustomFile(
+          key: key,
+          path: path,
+        ),
+      ).called(1);
+    });
+
+    test('addCustomFile can be called multiple times with same key', () async {
+      const key = 'testFile';
+      const path1 = '/path/to/file1.txt';
+      const path2 = '/path/to/file2.txt';
+
+      reporter
+        ..addCustomFile(key: key, path: path1)
+        ..addCustomFile(key: key, path: path2);
+
+      verifyInOrder([
+        () => customFilesHolder.addCustomFile(key: key, path: path1),
+        () => customFilesHolder.addCustomFile(key: key, path: path2),
+      ]);
     });
   });
 }

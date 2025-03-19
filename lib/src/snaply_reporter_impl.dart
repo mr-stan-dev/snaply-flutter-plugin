@@ -4,7 +4,6 @@ import 'package:snaply/src/data_holders/custom_attributes_holder.dart';
 import 'package:snaply/src/data_holders/custom_files_holder.dart';
 import 'package:snaply/src/logger/snaply_logger.dart';
 import 'package:snaply/src/snaply_reporter.dart';
-import 'package:snaply/src/snaply_reporter_mode.dart';
 
 class SnaplyReporterImpl implements SnaplyReporter {
   SnaplyReporterImpl({
@@ -23,24 +22,22 @@ class SnaplyReporterImpl implements SnaplyReporter {
   final SnaplyLogger _logger;
 
   @override
-  Future<void> init({SnaplyReporterMode? mode}) async {
-    _configHolder.setMode(mode);
-  }
-
-  @override
-  bool get isEnabled => _configHolder.isEnabled;
-
-  @override
   void setVisibility({
     required bool isVisible,
   }) {
-    _runIfEnabled(() => _configHolder.visibility.value = isVisible);
+    _runIfInitialized(() => _configHolder.visibility.value = isVisible);
   }
 
   @override
-  void setAttributes(Map<String, String> attributes) {
-    _runIfEnabled(
-      () => _attributesHolder.addAttributes(attributes),
+  void setAttributes({
+    required String attrKey,
+    required Map<String, String> attrMap,
+  }) {
+    _runIfInitialized(
+      () => _attributesHolder.addAttributes(
+        attrKey: attrKey,
+        attrMap: attrMap,
+      ),
     );
   }
 
@@ -48,22 +45,30 @@ class SnaplyReporterImpl implements SnaplyReporter {
   void log({
     required String message,
   }) {
-    _runIfEnabled(() => _logger.addLog(message: message));
+    _runIfInitialized(() => _logger.addLog(message: message));
   }
 
   @override
-  void setCustomFiles({
-    required Map<String, String>? filesPaths,
+  void addCustomFile({
+    required String key,
+    required String path,
   }) {
-    _runIfEnabled(
-      () => filesPaths == null
-          ? _customFilesHolder.clear()
-          : _customFilesHolder.setCustomFiles(filesPaths),
+    _runIfInitialized(
+      () => _customFilesHolder.addCustomFile(key: key, path: path),
     );
   }
 
-  void _runIfEnabled(VoidCallback function) {
-    if (isEnabled) {
+  @override
+  void registerCallbacks({
+    Future<void> Function()? onReportReview,
+  }) {
+    if (onReportReview != null) {
+      _configHolder.onReportReview = onReportReview;
+    }
+  }
+
+  void _runIfInitialized(VoidCallback function) {
+    if (_configHolder.isInitialized) {
       function();
     }
   }
