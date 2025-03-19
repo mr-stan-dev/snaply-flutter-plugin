@@ -19,6 +19,7 @@ void main() {
     );
     runApp(
       const SnaplyApp(
+        isVisible: true,
         child: exampleApp,
       ),
     );

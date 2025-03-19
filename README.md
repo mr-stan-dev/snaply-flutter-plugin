@@ -29,7 +29,7 @@ Designed for developers and QA engineers to enhance debugging and testing proces
 
 ```yaml  
 dependencies:
-  snaply: ^0.0.1-alpha.5  
+  snaply: ^0.0.1-alpha.6  
 ```  
 
 2. Wrap your App with SnaplyApp:
@@ -39,8 +39,12 @@ void main() {
   // Enable Snaply based on your build configuration
   const isSnaplyEnabled = true;
   if (isSnaplyEnabled) {
-    SnaplyReporter.instance.init();
-    runApp(const SnaplyApp(child: myApp));
+    runApp(
+      const SnaplyApp(
+        isVisible: true,
+        child: exampleApp,
+      ),
+    );
   } else {
     runApp(myApp);
   }
@@ -51,7 +55,7 @@ void main() {
 
 ### Control Visibility
 
-The report button is visible by default. To show or hide it, use:
+To show or hide report button in runtime, use:
 
 ```dart  
 SnaplyReporter.instance.setVisibility(isVisible: false);
@@ -61,13 +65,13 @@ SnaplyReporter.instance.setVisibility(isVisible: false);
 
 While Snaply automatically collects device & system attributes, you can add custom attributes:
 
-```dart  
- SnaplyReporter.instance.setAttributes(
-    {
-      'app_version': '0.0.1',
-      'locale': 'en_US',
-    },
-  );
+```dart
+SnaplyReporter.instance.setAttributes(
+  attrKey: 'app_info',
+  attrMap: {
+    'version': '0.0.1',
+  },
+);
 ```  
 
 ### Add Logs
@@ -76,6 +80,24 @@ Snaply includes basic internal logs by default. To capture additional logs, add 
 
 ```dart  
 SnaplyReporter.instance.log(message: 'Onboarding finished'); 
+```
+
+### Register Callbacks
+
+You can register onReportReview callback to execute custom logic right before review report. 
+E.G. you can set most up to date attributes or custom files:
+
+```dart
+SnaplyReporter.instance.registerCallbacks(
+  onReportReview: () async {
+    SnaplyReporter.instance.setAttributes(
+      attrKey: 'app_info',
+      attrMap: {
+        'version': '0.0.1',
+      },
+    );
+  },
+);
 ```
 
 ## Platform Specifics
