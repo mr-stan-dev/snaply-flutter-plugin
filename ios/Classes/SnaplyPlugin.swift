@@ -65,7 +65,16 @@ public class SnaplyPlugin: NSObject, FlutterPlugin {
         case SnaplyConstants.Methods.takeScreenshot:
             screenshotApi.takeScreenshot(result: result, controller: controller)
         case SnaplyConstants.Methods.startRecording:
-            screenRecordApi.startRecording(result: result)
+            do {
+                let path = try fileManager.getSnaplyFilesDir()
+                screenRecordApi.startRecording(directory: path, result: result)
+            } catch {
+                result(FlutterError(
+                    code: "DIRECTORY_ERROR",
+                    message: "Failed to get/create Snaply directory: \(error.localizedDescription)",
+                    details: nil
+                ))
+            }
         case SnaplyConstants.Methods.stopRecording:
             screenRecordApi.stopRecording(result: result)
         case SnaplyConstants.Methods.shareFiles:
@@ -74,7 +83,16 @@ public class SnaplyPlugin: NSObject, FlutterPlugin {
                 result: result
             )
         case SnaplyConstants.Methods.getSnaplyDirectory:
-            fileManager.getSnaplyFilesDir(result)
+            do {
+                let path = try fileManager.getSnaplyFilesDir()
+                result(path)
+            } catch {
+                result(FlutterError(
+                    code: "DIRECTORY_ERROR",
+                    message: "Failed to get/create Snaply directory: \(error.localizedDescription)",
+                    details: nil
+                ))
+            }
         case SnaplyConstants.Methods.getDeviceInfo:
             handleGetDeviceInfo(result: result)
         default:
